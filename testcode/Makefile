@@ -2,7 +2,7 @@ CC=arm-linux-gnueabi-gcc
 
 OBJS=test.o
 TARGET=test
-INCLUDE=~/os-team7/include
+INCLUDE=../include
 
 .SUFFIXES : .c .o
 
