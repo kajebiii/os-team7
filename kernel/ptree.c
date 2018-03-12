@@ -3,7 +3,7 @@
 #include <linux/prinfo.h>
 #include <linux/syscalls.h>
 
-SYSCALL_DEFINE2(ptree, prinfo *, buf, int *, nr)
+SYSCALL_DEFINE2(ptree, struct prinfo *, buf, int *, nr)
 {
 	return 0;
 }
