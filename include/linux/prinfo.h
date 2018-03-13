@@ -1,3 +1,6 @@
+
+#include <linux/types.h>
+
 struct prinfo {
   long state;             /* current state of process */
   pid_t pid;              /* process id */
