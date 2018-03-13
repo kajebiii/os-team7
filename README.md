@@ -14,3 +14,10 @@
 * team project
 * [branch](https://github.com/swsnu/os-team7/tree/proj1)
 
+* [link1](https://m.blog.naver.com/PostView.nhn?blogId=lee_seha&logNo=220339665756&proxyReferer=https%3A%2F%2Fwww.google.co.kr%2F)
+* [link2](https://bbingju.wordpress.com/2013/08/25/linux-kernel-list-h/)
+* [link3](http://linuxholic.tistory.com/entry/%EB%A6%AC%EB%88%85%EC%8A%A4-Taskstruct-%EA%B5%AC%EC%A1%B0)
+* [link4](http://webnautes.tistory.com/554)
+* [link5]()
+* [link6]()
+
