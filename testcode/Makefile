@@ -1,15 +1,15 @@
 CC=arm-linux-gnueabi-gcc
 
-OBJS=test.o
-TARGET=test
-INCLUDE=../include
-
+OBJS = test.o
+TARGET = test
+INCLUDE = -I../include
+CFLAGS = $(INCLUDE)
 .SUFFIXES : .c .o
 
 all:$(TARGET)
 
 $(TARGET) : $(OBJS)
-	$(CC) -I $(INCLUDE) -o $@ $(OBJS)
+	$(CC) -o $@ $(OBJS)
 
 build:
 	cd .. && ./build
