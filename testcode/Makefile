@@ -18,7 +18,7 @@ lthor:
 	cd .. && lthor image.tar
 
 run:
-	sdb root on && sdb push test /root/test && sdb shell /root/test
+	sdb root on && sdb push test /root/test && sdb shell "/root/test && ps aux"
 
 clean:
 	rm -r $(OBJS) $(TARGET)
