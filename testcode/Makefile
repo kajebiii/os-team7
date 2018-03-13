@@ -11,5 +11,14 @@ all:$(TARGET)
 $(TARGET) : $(OBJS)
 	$(CC) -I $(INCLUDE) -o $@ $(OBJS)
 
+build:
+	cd .. && ./build
+
+lthor:
+	cd .. && lthor image.tar
+
+run:
+	sdb root on && sdb push test /root/test && sdb shell /root/test
+
 clean:
 	rm -r $(OBJS) $(TARGET)
