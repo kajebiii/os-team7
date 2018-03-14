@@ -36,9 +36,7 @@ static int ptree_dfs(struct task_struct *now, struct prinfo* out, int *idx, int 
 		if(p->next != &(now->children)) {
 			ns = list_entry(p->next, struct task_struct, sibling)->pid;
 		}
-		err = ptree_dfs(t, out, idx, max_len, ns, now->pid);
-		if(err < 0) return err;
-		re += err;
+		re += ptree_dfs(t, out, idx, max_len, ns, now->pid);
 	}
 	return re;
 }
