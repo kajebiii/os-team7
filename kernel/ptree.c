@@ -60,6 +60,7 @@ SYSCALL_DEFINE2(ptree, struct prinfo *, buf, int *, nr)
 
 	kbuf_origin = kbuf = kmalloc(list_size*sizeof(struct prinfo), GFP_KERNEL);
 
+	if (kbuf == NULL) return -ENOSPC;
 	read_lock(&tasklist_lock);
 	num_of_proc = ptree_dfs(&init_task, kbuf, &idx, list_size, -1, -1);
 	read_unlock(&tasklist_lock);
