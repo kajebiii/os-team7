@@ -56,7 +56,7 @@ SYSCALL_DEFINE2(ptree, struct prinfo *, buf, int *, nr)
 	if ((err = get_user(list_size, nr)) < 0) return err;
 	if (list_size <= 0) return -EINVAL;
 
-	if (access_ok(VERIFY_WRITE, buf, list_size * sizeof(struct prinfo)) != 0) return -EFAULT;
+	if (access_ok(VERIFY_WRITE, buf, list_size * sizeof(struct prinfo)) == 0) return -EFAULT;
 
 	kbuf_origin = kbuf = kmalloc(list_size*sizeof(struct prinfo), GFP_KERNEL);
 
