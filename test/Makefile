@@ -1,7 +1,7 @@
 CC=arm-linux-gnueabi-gcc
 
-OBJS = test.o
-TARGET = test
+OBJS = test_ptree.o
+TARGET = test_ptree
 INCLUDE = -I../include
 CFLAGS = $(INCLUDE)
 .SUFFIXES : .c .o
@@ -18,7 +18,7 @@ lthor:
 	cd .. && lthor image.tar
 
 run:
-	sdb root on && sdb push test /root/test && sdb shell "/root/test && ps aux"
+	sdb root on && sdb push test_ptree /root/test_ptree && sdb shell "/root/test && ps aux"
 
 clean:
 	rm -r $(OBJS) $(TARGET)
