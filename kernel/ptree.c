@@ -67,8 +67,9 @@ SYSCALL_DEFINE2(ptree, struct prinfo *, buf, int *, nr)
 
 	if (num_of_proc < 0) return num_of_proc;
 
+	if(list_size > num_of_proc) list_size = num_of_proc;
 	ubuf = buf;
-	remain_bytes = (list_size<num_of_proc?list_size:num_of_proc) * sizeof(struct prinfo);
+	remain_bytes = list_size * sizeof(struct prinfo);
 	while(remain_bytes > 0){
 		write_bytes = copy_to_user(ubuf, kbuf, remain_bytes);
 		if(write_bytes < 0) return write_bytes;
@@ -77,6 +78,7 @@ SYSCALL_DEFINE2(ptree, struct prinfo *, buf, int *, nr)
 		kbuf += write_bytes;
 		remain_bytes -= write_bytes;
 	}
+	if((err = put_user(list_size, nr)) < 0) return err;
 
 	kfree(kbuf_origin);
 
