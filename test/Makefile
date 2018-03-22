@@ -18,7 +18,7 @@ lthor:
 	cd .. && lthor image.tar
 
 run:
-	sdb root on && sdb push test_ptree /root/test_ptree && sdb shell "/root/test && ps aux"
+	sdb root on && sdb push test_ptree /root/test_ptree && sdb shell "/root/test_ptree && pstree 0"
 
 clean:
 	rm -r $(OBJS) $(TARGET)
