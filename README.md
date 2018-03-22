@@ -1,4 +1,9 @@
- OS Team 7 Project
+OS Team 7 Project README
+
+## How to build kernel
+The way to build kernel doesn't differ from original kernel. Type "./build" in the root folder, and kernel will be builded.
+
+## How to execute test code
 
 ## [Comparing changes](https://github.com/swsnu/os-team7/compare/base...proj1)
 
@@ -28,5 +33,17 @@
 	- Copy ptree data from temporary buffer to user buffer.
 	- Free temporary buffer and returns with appropriate return value.
 
-## testcode/test.c
-please add contents
+## test/test_ptree.c
+* What test code does:
+	- Repeatedly calls syscall(380, data, &size) function, until it gets entire process tree properly. If program fails to get whole process tree, increase buffer size to be enough to contain whole processes.
+	- Print visualized process tree.
+	- Free pointers, and returns.
+
+## Investigation of the process tree
+* Process tree is the way to show all running processes using tree format. In this tree, each node represents one process. The parent of each node is parent proess, which is one that created the process. 'pstree' command can show process tree in Linux.
+* In Linux OS, there are slightly different two types of parent process, 'Real parent' and 'Parent'. Real parent process is same with original definition. It means the process that created child process. Parent process is the process that receives SIGCHLD signal. These two process can be different one. In process tree, real parent process becomes parent node. 
+* Processes information are stored with "struct task_struct" type in kernel. This struct contains lots of informations about the process such as process id, parent process id, sibling process id, process state, and so on. We can follow these struct using parent/children pointer, and effectively build process tree using DFS.
+
+## Any lessons learned
+
+
