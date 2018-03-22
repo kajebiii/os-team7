@@ -40,9 +40,9 @@ The way to build kernel doesn't differ from original kernel. Type "./build" in t
 	- Free pointers, and returns.
 
 ## Investigation of the process tree
-* Process tree is the way to show all running processes using tree format. In this tree, each node represents one process. The parent of each node is parent proess, which is one that created the process. 'pstree' command can show process tree in Linux.
-* In Linux OS, there are slightly different two types of parent process, 'Real parent' and 'Parent'. Real parent process is same with original definition. It means the process that created child process. Parent process is the process that receives SIGCHLD signal. These two process can be different one. In process tree, real parent process becomes parent node. 
-* Processes information are stored with "struct task_struct" type in kernel. This struct contains lots of informations about the process such as process id, parent process id, sibling process id, process state, and so on. We can follow these struct using parent/children pointer, and effectively build process tree using DFS.
+* Process tree is the way to show all running processes using tree format. In this tree, each node represents one process. The parent of each node is parent process, which is one that created the process. 'pstree' command can show process tree in Linux.
+* In Linux OS, there are slightly different two types of parent process, 'Real parent' and 'Parent'. Real parent process is same with original definition. It means the process that created child process. Parent process is the process that receives SIGCHLD signal. These two process coulc be different. In process tree, real parent process becomes parent node. 
+* Process information is stored with "struct task_struct" type in kernel. This struct contains lots of informations about the process such as process id, parent process id, sibling process id, process state, and so on. We can follow these struct using parent/children pointer, and build process tree effectively by using DFS.
 
 ## Any lessons learned
 * We learned how to use Git and Github properly. We used branch and push/pull process properly and it helped our work a lot.
