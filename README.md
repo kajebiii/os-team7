@@ -45,5 +45,6 @@ The way to build kernel doesn't differ from original kernel. Type "./build" in t
 * Processes information are stored with "struct task_struct" type in kernel. This struct contains lots of informations about the process such as process id, parent process id, sibling process id, process state, and so on. We can follow these struct using parent/children pointer, and effectively build process tree using DFS.
 
 ## Any lessons learned
-
-
+* We learned how to use Git and Github properly. We used branch and push/pull process properly and it helped our work a lot.
+* We learned about the structure how processes are stored in Linux system. We learned about task_struct structure and figured out which information they contains. Furthermore, we could found some useful informations for further assignments.
+* We learned how to add system calls in Linux system. We learned about modifying appropriate files, using useful macros in low-level programming. 
