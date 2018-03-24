@@ -1,9 +1,27 @@
-OS Team 7 Project README
+#OS Team 7 Project 1 README
 
 ## How to build kernel
-The way to build kernel doesn't differ from original kernel. Type "./build" in the root folder, and kernel will be builded.
+The way to build kernel doesn't differ from original kernel. Type `./build` in the root folder, and kernel will be builded. Or you can type `make build` in the "test" folder.
+
+## Flashing the Device
+The way to flash the device doesn't differ from original.
+
+After the building is done.
+
+1. Open the debug console. (Use `screen` command or PuTTY)
+1. Hit reset button on the device.
+1. Push and hold power button for 1 second.
+1. You'll see `Hit any key to stop autoboot`. Press any key.
+1. Type `thordown` and <kbd>Enter</kbd>. The device will enter thordown mode.
+
+Just type `lthor image.tar` in the root folder, or `make lthor` in the "test" folder.
 
 ## How to execute test code
+After logging in, you have to execute `direct_set_debug.sh --sdb-set` to enable sdb.
+
+In the "test" folder, type `make clean` and `make`.
+
+Then type `make run`, will show result of our test code(ptree) and result of `pstree 0`
 
 
 ## [Comparing changes](https://github.com/swsnu/os-team7/compare/base...proj1)
