@@ -1,7 +1,8 @@
-#include <asm/unistd.h>
+#define _GNU_SOURCE
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>
 
 struct prinfo {
@@ -30,7 +31,7 @@ int main() {
 	for(i=0; i<re; i++){
 		while(top != -1 && stk[top] != data[i].parent_pid) top--;
 		stk[++top] = data[i].pid;
-		printf("%*s%s,%d,%ld,%d,%d,%d,%d\n", top*2, "", data[i].comm, data[i].pid,
+		printf("%*s%s,%d,%ld,%d,%d,%d,%ld\n", top*2, "", data[i].comm, data[i].pid,
 			data[i].state,data[i].parent_pid, data[i].first_child_pid, data[i].next_sibling_pid, data[i].uid);
 	}
 	free(data);
