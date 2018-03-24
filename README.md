@@ -5,6 +5,7 @@ The way to build kernel doesn't differ from original kernel. Type "./build" in t
 
 ## How to execute test code
 
+
 ## [Comparing changes](https://github.com/swsnu/os-team7/compare/base...proj1)
 
 ## Preprocess
@@ -22,7 +23,7 @@ The way to build kernel doesn't differ from original kernel. Type "./build" in t
 	- nr : Size of the buffer
 
 * Output for system call: prinfo* buf, int* nr, return value
-	- buf : process tree information are copied to buf pointer. Number of entries written in buffer is equal to min(size of buffer, total number of entries on success) 
+	- buf : process tree information are copied to buf pointer. Number of entries written in buffer is equal to min(size of buffer, total number of entries on success).
 	- nr : Number of entries written in buffer is stored to nr pointer.
 	- return value : If system call successfully returned, the return value will be total number of entries on success. This value may be different from actual number of entries copied. If buf/nr pointer is NULL or value stored in nr is not a positive integer, -EINVAL is returned. If system call cannot write to the buffer, -EFAULT is returned. If kernel doesn't have enough memory and can't afford temporary buffer to hold process informations, -ENOSPC is returned.
 
@@ -46,5 +47,5 @@ The way to build kernel doesn't differ from original kernel. Type "./build" in t
 
 ## Any lessons learned
 * We learned how to use Git and Github properly. We used branch and push/pull process properly and it helped our work a lot.
-* We learned about the structure how processes are stored in Linux system. We learned about task_struct structure and figured out which information they contains. Furthermore, we could found some useful informations for further assignments.
+* We learned about the structure how processes are stored in Linux system. We learned about task_struct structure and figured out which information they contains. We learned how to build linked list using list_head structure and related macros. Furthermore, we could found some useful informations for further assignments.
 * We learned how to add system calls in Linux system. We learned about modifying appropriate files, using useful macros in low-level programming. 
