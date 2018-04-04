@@ -11,7 +11,7 @@ obj-y     = fork.o exec_domain.o panic.o printk.o \
 	    hrtimer.o rwsem.o nsproxy.o srcu.o semaphore.o \
 	    notifier.o ksysfs.o cred.o \
 	    async.o range.o groups.o lglock.o smpboot.o \
-		set_rotation.o rotlock_read.o rotlock_write.o rotunlock_read.o rotunlock_write.o
+		set_rotation.o rotlock.o
 
 ifdef CONFIG_FUNCTION_TRACER
 # Do not trace debug files and internal ftrace files
