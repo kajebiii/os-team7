@@ -53,6 +53,7 @@
 #include <linux/oom.h>
 #include <linux/writeback.h>
 #include <linux/shm.h>
+#include <linux/rotation.h>
 
 #include <asm/uaccess.h>
 #include <asm/unistd.h>
@@ -798,6 +799,8 @@ void do_exit(long code)
 		acct_process();
 	trace_sched_process_exit(tsk);
 
+
+	exit_rotlock(tsk);
 	exit_sem(tsk);
 	exit_shm(tsk);
 	exit_files(tsk);
