@@ -26,6 +26,21 @@ static LIST_HEAD(wait_node_list_read);
 static LIST_HEAD(wait_node_list_write);
 
 struct lock_info* write_accquired[360];
+struct list_head read_accquired[360];
+
+static void find_available(){
+	wait_node *iter;
+
+	mutex_lock(rotlock_mutex);
+
+	list_for_each_entry(iter, &wait_node_list_write, list){
+		// TODO: check for curret iter
+
+	}
+
+
+	mutex_unlock(rotlock_mutext);
+}
 
 static int lock(int degree, int range, int mode){
 	// TODO : validate degree, range
@@ -41,11 +56,10 @@ static int lock(int degree, int range, int mode){
 
 	// accquire lock
 	mutex_lock(rotlock_mutex);
-
 	list_add(&(wait_node->list), mode==1?wait_node_list_read.prev:wait_node_list_write.prev);
-	// TODO :
+	mutex_unlock(rotlock_mutex);
 
-	mutex_unlock(rotlock_mutex); 
+	find_available();
 }
 
 SYSCALL_DEFINE2(rotunlock_read, int, degree, int, range)
@@ -66,6 +80,15 @@ SYSCALL_DEFINE1(set_rotation, int, degree)
 void exit_rotlock(struct task_struct *tsk)
 {
 	//
+}
+
+// init array of list_head
+// call from start_kernel in main.c
+void rotlock_init()
+{
+	int i;
+	for(i=0; i<360; i++)
+		INIT_LIST_HEAD(read_accquired[i]);
 }
 
 SYSCALL_DEFINE2(rotlock_read, int, degree, int, range)
