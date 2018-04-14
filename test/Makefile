@@ -1,15 +1,16 @@
 CC=arm-linux-gnueabi-gcc
 
-OBJS = trial.o selector.o
-TARGET = trial selector
+OBJS = trial.o selector.o rotd.o
+TARGET = trial selector rotd
+
 INCLUDE = -I../include
 CFLAGS = $(INCLUDE)
 .SUFFIXES : .c .o
 
-all:$(TARGET)
-
-$(TARGET) : $(OBJS)
-	$(CC) -o $@ $(OBJS)
+all: trial selector rotd
+trial: 
+selector: 
+rotd:
 
 build:
 	cd .. && ./build
@@ -18,7 +19,7 @@ lthor:
 	cd .. && lthor image.tar
 
 run:
-	sdb root on && sdb push selector /root/selector && sdb push trial /root/trial"
+	sdb root on && sdb push selector /root/selector && sdb push trial /root/trial && sdb push rotd /root/rotd
 
 clean:
-	rm -r $(OBJS) $(TARGET)
+	rm -r $(TARGET)

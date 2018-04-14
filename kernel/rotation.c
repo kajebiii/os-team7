@@ -19,7 +19,8 @@
  * @value:	variable for contains currunt degree.
  */
 #define for_each_in_range(center, range, iter, value) \
-	for ((iter)=-(range); (iter) <= (range); \
+	for ((iter)=-(range), (value)=(center)-(range)+(((center)-(range))<0?360:((center)-(range))>=360?-360:0); \
+		(iter) <= (range); \
 		(iter)++, (value)=(center)+(iter), \
 		(value) += ( ((value)<0)?360:0 ), (value) -= (((value)>=360)?360:0) )
 
@@ -71,6 +72,7 @@ static inline int validate_range(int center, int range){
 
 static void find_available(void)
 {
+	//printk("[rotation] find_available\n");
 	struct lock_info *iter, *temp_node_iter;
 	int i, center, range, degree_now;
 	int write_in_degree;
@@ -82,6 +84,7 @@ static void find_available(void)
 		center = iter->degree;
 		range = iter->range;
 		if(!check_in_range(center, range, SYSTEM_DEGREE)) continue;
+		printk("[rotation] list_for_each %d %d\n", center, range);
 		write_in_degree = 1;
 		// check for curret iter
 		for_each_in_range(center, range, i, degree_now){
@@ -92,12 +95,17 @@ static void find_available(void)
 			// edit write_acc
 			for_each_in_range(center, range, i, degree_now)
 				write_acc_chk[degree_now]++;
+			printk("[rotation] after_for in find\n");
 
 			// remove from wait_node_write
-			list_del(&(iter->list));
 			list_add(&(iter->list), acc_node_list_write.prev);
+			printk("[rotation] after_add in find\n");
+			list_del(&(iter->list));
+			printk("[rotation] after_del in find\n");
 			complete(&(iter->comp));
+			printk("[rotation] after_complete in find\n");
 			mutex_unlock(&rotlock_mutex);
+			printk("[rotation] mutex_unlock in find\n");
 			return;
 		}
 	}
@@ -122,8 +130,8 @@ static void find_available(void)
 				read_acc_chk[degree_now]++;
 			}
 			// remove from wait_node_write
-			list_del(&(iter->list));
 			list_add(&(iter->list), acc_node_list_read.prev);
+			list_del(&(iter->list));
 			complete(&(iter->comp));
 		}
 	}
@@ -149,8 +157,10 @@ static int lock(int degree, int range, int mode)
 	mutex_lock(&rotlock_mutex);
 	list_add(&(mylock->list), mode==ROTLOCK_MODE_READ?wait_node_list_read.prev:wait_node_list_write.prev);
 	mutex_unlock(&rotlock_mutex);
+	printk("[rotation] After list_add in lock (%d %d %d)\n", degree, range, mode);
 // ??? can wrong thread wakeup occurs
 	find_available();
+	printk("[rotation] After find_avaliable in lock (%d %d %d)\n", degree, range, mode);
 
 	// TODO : wait_for_completion -> wait_for_completion_interruptible for make process interruptible
 	/*err = wait_for_completion_interruptible(&(mylock->comp));
@@ -161,6 +171,7 @@ static int lock(int degree, int range, int mode)
 	// else err == 0, get lock and return*/
 	
 	wait_for_completion(&(mylock->comp));
+	printk("[rotation] After wait_for_completion in lock (%d %d %d)\n", degree, range, mode);
 	return 0;
 }
 
@@ -251,6 +262,7 @@ void exit_rotlock(struct task_struct *tsk)
 
 SYSCALL_DEFINE1(set_rotation, int, degree)
 {
+	printk("[rotation] set_rotation %d\n", degree);
 	mutex_lock(&rotlock_mutex);
 	SYSTEM_DEGREE = degree;
 	mutex_unlock(&rotlock_mutex);
@@ -260,20 +272,24 @@ SYSCALL_DEFINE1(set_rotation, int, degree)
 
 SYSCALL_DEFINE2(rotlock_read, int, degree, int, range)
 {
+	printk("[rotation] rotlock_read %d\n", degree);
 	return lock(degree, range, ROTLOCK_MODE_READ);
 }
 
 SYSCALL_DEFINE2(rotlock_write, int, degree, int, range)
 {
+	printk("[rotation] rotlock_write %d\n", degree);
 	return lock(degree, range, ROTLOCK_MODE_WRITE);
 }
 
 SYSCALL_DEFINE2(rotunlock_read, int, degree, int, range)
 {
+	printk("[rotation] rotunlock_read %d\n", degree);
 	return unlock(degree, range, ROTLOCK_MODE_READ);
 }
 
 SYSCALL_DEFINE2(rotunlock_write, int, degree, int, range)
 {
+	printk("[rotation] rotunlock_write %d\n", degree);
 	return unlock(degree, range, ROTLOCK_MODE_WRITE);
 }

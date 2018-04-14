@@ -10,12 +10,8 @@
 #define SYSCALL_ROTLOCK_READ 381
 #define SYSCALL_ROTLOCK_WRITE 382
 #define SYSCALL_ROTUNLOCK_READ 383
-#define SYSCALL_ROTUNLOCK_WRTIE 385
+#define SYSCALL_ROTUNLOCK_WRITE 385
 
-void delay(int sec){
-    clock_t start = clock();
-    while((clock() - start) / CLOCKS_PER_SEC < sec);
-}
 
 int main(int argc, char *argv[]){
 	if(argc != 2) {
@@ -30,7 +26,7 @@ int main(int argc, char *argv[]){
     while(1){
         int n, i;
         FILE *fp = fopen("integer", "r");
-		//syscall(SYSCALL_ROTLOCK_READ, 90, 90);
+		syscall(SYSCALL_ROTLOCK_READ, 90, 90);
         fscanf(fp, "%d", &n);
 		printf("trial-%d: %d = ", id, n);
         for(i=2; i<=n; i++){
@@ -42,7 +38,7 @@ int main(int argc, char *argv[]){
         }
 		puts("");
 		fclose(fp);
-		//syscall(SYSCALL_ROTLOCK_READ, 90, 90);
-        delay(1);
+		syscall(SYSCALL_ROTLOCK_READ, 90, 90);
+        sleep(1);
     }
 }

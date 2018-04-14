@@ -10,12 +10,8 @@
 #define SYSCALL_ROTLOCK_READ 381
 #define SYSCALL_ROTLOCK_WRITE 382
 #define SYSCALL_ROTUNLOCK_READ 383
-#define SYSCALL_ROTUNLOCK_WRTIE 385
+#define SYSCALL_ROTUNLOCK_WRITE 385
 
-void delay(int sec){
-    clock_t start = clock();
-    while((clock() - start) / CLOCKS_PER_SEC < sec);
-}
 int main(int argc, char *argv[]){
 	if(argc != 2) {
 		printf("Usage ./selector [STARTING INTEGER]");
@@ -28,12 +24,12 @@ int main(int argc, char *argv[]){
 	}
     while(1){
         FILE *fp = fopen("integer", "w");
-		//syscall(SYSCALL_ROTLOCK_WRITE, 90, 90);
+		syscall(SYSCALL_ROTLOCK_WRITE, 90, 90);
         fprintf(fp, "%d\n",n);
         printf("selector: %d\n",n);
 		fclose(fp);
-		//syscall(SYSCALL_ROTUNLOCK_WRITE, 90, 90);
+		syscall(SYSCALL_ROTUNLOCK_WRITE, 90, 90);
         n++;
-        delay(1);
+        sleep(1);
     }
 }
