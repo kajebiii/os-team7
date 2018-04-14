@@ -19,7 +19,7 @@
  * @value:	variable for contains currunt degree.
  */
 #define for_each_in_range(center, range, iter, value) \
-	for ((iter)=-(range); (iter) < (range); \
+	for ((iter)=-(range); (iter) <= (range); \
 		(iter)++, (value)=(center)+(iter), \
 		(value) += ( ((value)<0)?360:0 ), (value) -= (((value)>=360)?360:0) )
 
@@ -49,7 +49,7 @@ static int read_acc_chk[360];
 	call find_avaialbe in lock?
 */
 
-// get distance between x and b in circular case
+// get distance between x and y in circular case
 static inline int get_dist(int x, int y)
 {
 	if(x<y) x^=y^=x^=y;
@@ -78,7 +78,7 @@ static void find_available(void)
 	mutex_lock(&rotlock_mutex);
 
 	write_in_degree = 0;
-	list_for_each_entry(iter, &wait_node_list_write, list){
+	list_for_each_entry_safe(iter, temp_node_iter, &wait_node_list_write, list){
 		center = iter->degree;
 		range = iter->range;
 		if(!check_in_range(center, range, SYSTEM_DEGREE)) continue;
