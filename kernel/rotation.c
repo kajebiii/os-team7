@@ -89,7 +89,6 @@ static long find_available(void)
 		center = iter->degree;
 		range = iter->range;
 		if(!check_in_range(center, range, SYSTEM_DEGREE)) continue;
-		//printk("[rotation] list_for_each %d %d\n", center, range);
 		write_in_degree = 1;
 		// check for curret iter
 		for_each_in_range(center, range, i, degree_now){
@@ -152,7 +151,6 @@ static long rotlock_wait(struct completion *comp)
 		restart->rotlock.comp = comp;
 		return -ERESTART_RESTARTBLOCK;
 	}
-	//printk("[rotation] After wait_for_completion in lock (%d %d %d)\n", degree, range, mode);
 	return 0;
 }
 
@@ -181,7 +179,6 @@ static long lock(int degree, int range, int mode)
 	mutex_unlock(&rotlock_mutex);
 // ??? can wrong thread wakeup occurs
 	find_available();
-	printk("[rotation] After find_avaliable in lock (%d %d %d)\n", degree, range, mode);
 	
 	return rotlock_wait(&(mylock->comp));
 }
@@ -195,11 +192,9 @@ static long unlock(int degree, int range, int mode)
 	if(validate_range(degree, range) == 0) return -EINVAL;
 	
 	mutex_lock(&rotlock_mutex);
-	printk("[rotation] After mutex_lock in unlock (%d %d %d)\n", degree, range, mode);
 
 	list_for_each_entry(node, acc_node_list_this_mode, list){
 		// check this unlock equals to node
-		printk("[rotation] node info!! %d %d %d in unlock\n", node->degree, node->range, node->mode);
 		if(node->degree == degree &&
 		 node->range == range &&
 		 node->proc == current &&
@@ -207,9 +202,7 @@ static long unlock(int degree, int range, int mode)
 			break;
 		
 	}
-	printk("[rotation] After list_for in unlock (%d %d %d)\n", degree, range, mode);
 	if(&(node->list) == acc_node_list_this_mode){
-		printk("[rotation] If inscope in unlock (%d %d %d)\n", degree, range, mode);
 		mutex_unlock(&rotlock_mutex);
 		return -EINVAL; // return error
 	}
@@ -217,12 +210,10 @@ static long unlock(int degree, int range, int mode)
 	for_each_in_range(node->degree, node->range, i, degree_now){
 		(mode == ROTLOCK_MODE_READ?read_acc_chk:write_acc_chk)[degree_now]--;
 	}
-	printk("[rotation] After for_each in unlock (%d %d %d)\n", degree, range, mode);
 	// remove from wait_node_write
 	list_del(&(node->list));
 	kfree(node);
 	mutex_unlock(&rotlock_mutex);
-	printk("[rotation] After mutex_unlock in unlock (%d %d %d)\n", degree, range, mode);
 
 	find_available();
 	return 0;
@@ -289,7 +280,6 @@ SYSCALL_DEFINE1(set_rotation, int, degree)
 {
 	if(degree < 0 || degree >= 360)
 		return -EINVAL;
-	printk("[rotation] set_rotation %d\n", degree);
 	mutex_lock(&rotlock_mutex);
 	SYSTEM_DEGREE = degree;
 	mutex_unlock(&rotlock_mutex);
@@ -298,24 +288,20 @@ SYSCALL_DEFINE1(set_rotation, int, degree)
 
 SYSCALL_DEFINE2(rotlock_read, int, degree, int, range)
 {
-	printk("[rotation] rotlock_read %d\n", degree);
 	return lock(degree, range, ROTLOCK_MODE_READ);
 }
 
 SYSCALL_DEFINE2(rotlock_write, int, degree, int, range)
 {
-	printk("[rotation] rotlock_write %d\n", degree);
 	return lock(degree, range, ROTLOCK_MODE_WRITE);
 }
 
 SYSCALL_DEFINE2(rotunlock_read, int, degree, int, range)
 {
-	printk("[rotation] rotunlock_read %d\n", degree);
 	return unlock(degree, range, ROTLOCK_MODE_READ);
 }
 
 SYSCALL_DEFINE2(rotunlock_write, int, degree, int, range)
 {
-	printk("[rotation] rotunlock_write %d\n", degree);
 	return unlock(degree, range, ROTLOCK_MODE_WRITE);
 }
