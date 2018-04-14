@@ -23,8 +23,8 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
     while(1){
-        FILE *fp = fopen("integer", "w");
 		syscall(SYSCALL_ROTLOCK_WRITE, 90, 90);
+        FILE *fp = fopen("integer", "w");
         fprintf(fp, "%d\n",n);
         printf("selector: %d\n",n);
 		fclose(fp);

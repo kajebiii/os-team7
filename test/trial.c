@@ -24,9 +24,9 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
     while(1){
+		syscall(SYSCALL_ROTLOCK_READ, 90, 90);
         int n, i;
         FILE *fp = fopen("integer", "r");
-		syscall(SYSCALL_ROTLOCK_READ, 90, 90);
         fscanf(fp, "%d", &n);
 		printf("trial-%d: %d = ", id, n);
         for(i=2; i<=n; i++){
