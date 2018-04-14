@@ -1,7 +1,7 @@
 CC=arm-linux-gnueabi-gcc
 
-OBJS = test.o
-TARGET = test
+OBJS = trial.o selector.o
+TARGET = trial selector
 INCLUDE = -I../include
 CFLAGS = $(INCLUDE)
 .SUFFIXES : .c .o
@@ -18,7 +18,7 @@ lthor:
 	cd .. && lthor image.tar
 
 run:
-	sdb root on && sdb push test /root/test && sdb shell "/root/test"
+	sdb root on && sdb push selector /root/selector && sdb push trial /root/trial"
 
 clean:
 	rm -r $(OBJS) $(TARGET)
