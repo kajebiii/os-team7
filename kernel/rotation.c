@@ -75,7 +75,7 @@ static inline int validate_range(int center, int range){
 }
 
 // return total # of wakeup lock
-static int find_available(void)
+static long find_available(void)
 {
 	struct lock_info *iter, *temp_node_iter;
 	int i, center, range, degree_now;
@@ -140,9 +140,29 @@ static int find_available(void)
 	return count_accquired_readlock;
 }
 
-static int lock(int degree, int range, int mode)
-{
+static long rotlock_wait_restart(struct restart_block *restart);
+static long rotlock_wait(struct completion *comp)
+{	
+	struct restart_block *restart;
 	int err;
+	err = wait_for_completion_interruptible(comp);
+	if(err == -ERESTARTSYS){
+		restart = &current_thread_info()->restart_block;
+		restart->fn = rotlock_wait_restart;
+		restart->rotlock.comp = comp;
+		return -ERESTART_RESTARTBLOCK;
+	}
+	//printk("[rotation] After wait_for_completion in lock (%d %d %d)\n", degree, range, mode);
+	return 0;
+}
+
+static long rotlock_wait_restart(struct restart_block *restart)
+{
+	return rotlock_wait(restart->rotlock.comp);
+}
+
+static long lock(int degree, int range, int mode)
+{
 	struct lock_info *mylock;
 
 	if(validate_range(degree, range) == 0) return -EINVAL;
@@ -162,22 +182,11 @@ static int lock(int degree, int range, int mode)
 // ??? can wrong thread wakeup occurs
 	find_available();
 	printk("[rotation] After find_avaliable in lock (%d %d %d)\n", degree, range, mode);
-
-	// TODO : wait_for_completion -> wait_for_completion_interruptible for make process interruptible
-	/*err = wait_for_completion_interruptible(&(mylock->comp));
-	if(err == -ERESTARTSYS){
-		// TODO : for return erestart, setup restart struct (maybe move wait to another function)
-		return -ERESTARTSYS;
-	} 
-	// else err == 0, get lock and return*/
 	
-	err = wait_for_completion_killable(&(mylock->comp));
-	if(err < 0) return -EINTR;
-	printk("[rotation] After wait_for_completion in lock (%d %d %d)\n", degree, range, mode);
-	return 0;
+	return rotlock_wait(&(mylock->comp));
 }
 
-static int unlock(int degree, int range, int mode)
+static long unlock(int degree, int range, int mode)
 {
 	struct lock_info *node;
 	int degree_now, i;

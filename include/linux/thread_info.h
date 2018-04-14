@@ -12,6 +12,7 @@
 
 struct timespec;
 struct compat_timespec;
+struct completion;
 
 /*
  * System call restart block.
@@ -45,6 +46,10 @@ struct restart_block {
 			unsigned long tv_sec;
 			unsigned long tv_nsec;
 		} poll;
+		/* For rotlock */
+		struct {
+			struct completion *comp;
+		} rotlock;
 	};
 };
 
