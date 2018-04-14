@@ -101,7 +101,7 @@ static long find_available(void)
 				write_acc_chk[degree_now]++;
 			// remove from wait_node_write
 			list_del(&(iter->list));
-			list_add(&(iter->list), acc_node_list_write.prev);
+			list_add_tail(&(iter->list), &acc_node_list_write);
 			complete(&(iter->comp));
 			mutex_unlock(&rotlock_mutex);
 			return 1;
@@ -129,7 +129,7 @@ static long find_available(void)
 			}
 			// remove from wait_node_write
 			list_del(&(iter->list));
-			list_add(&(iter->list), acc_node_list_read.prev);
+			list_add_tail(&(iter->list), &acc_node_list_read);
 			complete(&(iter->comp));
 			count_accquired_readlock++;
 		}
@@ -175,7 +175,7 @@ static long lock(int degree, int range, int mode)
 
 	// accquire lock
 	mutex_lock(&rotlock_mutex);
-	list_add(&(mylock->list), mode==ROTLOCK_MODE_READ?wait_node_list_read.prev:wait_node_list_write.prev);
+	list_add_tail(&(mylock->list), mode==ROTLOCK_MODE_READ?(&wait_node_list_read):(&wait_node_list_write));
 	mutex_unlock(&rotlock_mutex);
 // ??? can wrong thread wakeup occurs
 	find_available();
