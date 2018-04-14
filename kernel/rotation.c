@@ -74,11 +74,13 @@ static inline int validate_range(int center, int range){
 	return 1;
 }
 
-static void find_available(void)
+// return total # of wakeup lock
+static int find_available(void)
 {
 	struct lock_info *iter, *temp_node_iter;
 	int i, center, range, degree_now;
 	int write_in_degree;
+	int count_accquired_readlock = 0;
 
 	mutex_lock(&rotlock_mutex);
 
@@ -103,13 +105,13 @@ static void find_available(void)
 			list_add(&(iter->list), acc_node_list_write.prev);
 			complete(&(iter->comp));
 			mutex_unlock(&rotlock_mutex);
-			return;
+			return 1;
 		}
 	}
 
 	if(write_in_degree){
 		mutex_unlock(&rotlock_mutex);
-		return;
+		return 0;
 	}
 
 	// simillar for read
@@ -130,10 +132,12 @@ static void find_available(void)
 			list_del(&(iter->list));
 			list_add(&(iter->list), acc_node_list_read.prev);
 			complete(&(iter->comp));
+			count_accquired_readlock++;
 		}
 	}
 
 	mutex_unlock(&rotlock_mutex);
+	return count_accquired_readlock;
 }
 
 static int lock(int degree, int range, int mode)
@@ -272,12 +276,13 @@ void exit_rotlock(struct task_struct *tsk)
 
 SYSCALL_DEFINE1(set_rotation, int, degree)
 {
+	if(degree < 0 || degree >= 360)
+		return -EINVAL;
 	printk("[rotation] set_rotation %d\n", degree);
 	mutex_lock(&rotlock_mutex);
 	SYSTEM_DEGREE = degree;
 	mutex_unlock(&rotlock_mutex);
-	find_available();
-	return 0;
+	return find_available();
 }
 
 SYSCALL_DEFINE2(rotlock_read, int, degree, int, range)
