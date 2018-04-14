@@ -76,8 +76,6 @@ static inline int validate_range(int center, int range){
 
 static void find_available(void)
 {
-	printk("[rotation] find_available\n");
-	struct lock_info *copy_iter;
 	struct lock_info *iter, *temp_node_iter;
 	int i, center, range, degree_now;
 	int write_in_degree;
@@ -89,7 +87,7 @@ static void find_available(void)
 		center = iter->degree;
 		range = iter->range;
 		if(!check_in_range(center, range, SYSTEM_DEGREE)) continue;
-		printk("[rotation] list_for_each %d %d\n", center, range);
+		//printk("[rotation] list_for_each %d %d\n", center, range);
 		write_in_degree = 1;
 		// check for curret iter
 		for_each_in_range(center, range, i, degree_now){
@@ -100,23 +98,11 @@ static void find_available(void)
 			// edit write_acc
 			for_each_in_range(center, range, i, degree_now)
 				write_acc_chk[degree_now]++;
-			printk("[rotation] after_for in find\n");
-
 			// remove from wait_node_write
-			copy_iter = kmalloc(sizeof(struct lock_info), GFP_KERNEL);
-			copy_iter->degree = iter->degree;
-			copy_iter->range = iter->range;
-			copy_iter->mode = iter->mode;
-			copy_iter->proc = iter->proc;
-
-			list_add(&(copy_iter->list), acc_node_list_write.prev);
-			printk("[rotation] after_add in find\n");
 			list_del(&(iter->list));
-			printk("[rotation] after_del in find\n");
+			list_add(&(iter->list), acc_node_list_write.prev);
 			complete(&(iter->comp));
-			printk("[rotation] after_complete in find\n");
 			mutex_unlock(&rotlock_mutex);
-			printk("[rotation] mutex_unlock in find\n");
 			return;
 		}
 	}
@@ -140,14 +126,9 @@ static void find_available(void)
 			for_each_in_range(center, range, i, degree_now){
 				read_acc_chk[degree_now]++;
 			}
-			copy_iter = kmalloc(sizeof(struct lock_info), GFP_KERNEL);
-			copy_iter->degree = iter->degree;
-			copy_iter->range = iter->range;
-			copy_iter->mode = iter->mode;
-			copy_iter->proc = iter->proc;
 			// remove from wait_node_write
-			list_add(&(copy_iter->list), acc_node_list_read.prev);
 			list_del(&(iter->list));
+			list_add(&(iter->list), acc_node_list_read.prev);
 			complete(&(iter->comp));
 		}
 	}
@@ -234,7 +215,6 @@ static int unlock(int degree, int range, int mode)
 
 void exit_rotlock(struct task_struct *tsk)
 {
-	return;
 	struct lock_info *node, *temp_lock_info;
 	int i, degree_now;
 
