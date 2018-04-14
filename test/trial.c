@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
         }
 		puts("");
 		fclose(fp);
-		syscall(SYSCALL_ROTLOCK_READ, 90, 90);
+		syscall(SYSCALL_ROTUNLOCK_READ, 90, 90);
         sleep(1);
     }
 }

@@ -53,7 +53,11 @@ static int read_acc_chk[360];
 // get distance between x and y in circular case
 static inline int get_dist(int x, int y)
 {
-	if(x<y) x^=y^=x^=y;
+	if(x<y) {
+		int t = y;
+		y = x;
+		x = t;
+	}
 	if(x-y <= 180) return x-y;
 	else return y-x+360;
 }
@@ -72,7 +76,8 @@ static inline int validate_range(int center, int range){
 
 static void find_available(void)
 {
-	//printk("[rotation] find_available\n");
+	printk("[rotation] find_available\n");
+	struct lock_info *copy_iter;
 	struct lock_info *iter, *temp_node_iter;
 	int i, center, range, degree_now;
 	int write_in_degree;
@@ -98,7 +103,13 @@ static void find_available(void)
 			printk("[rotation] after_for in find\n");
 
 			// remove from wait_node_write
-			list_add(&(iter->list), acc_node_list_write.prev);
+			copy_iter = kmalloc(sizeof(struct lock_info), GFP_KERNEL);
+			copy_iter->degree = iter->degree;
+			copy_iter->range = iter->range;
+			copy_iter->mode = iter->mode;
+			copy_iter->proc = iter->proc;
+
+			list_add(&(copy_iter->list), acc_node_list_write.prev);
 			printk("[rotation] after_add in find\n");
 			list_del(&(iter->list));
 			printk("[rotation] after_del in find\n");
@@ -129,8 +140,13 @@ static void find_available(void)
 			for_each_in_range(center, range, i, degree_now){
 				read_acc_chk[degree_now]++;
 			}
+			copy_iter = kmalloc(sizeof(struct lock_info), GFP_KERNEL);
+			copy_iter->degree = iter->degree;
+			copy_iter->range = iter->range;
+			copy_iter->mode = iter->mode;
+			copy_iter->proc = iter->proc;
 			// remove from wait_node_write
-			list_add(&(iter->list), acc_node_list_read.prev);
+			list_add(&(copy_iter->list), acc_node_list_read.prev);
 			list_del(&(iter->list));
 			complete(&(iter->comp));
 		}
@@ -157,7 +173,6 @@ static int lock(int degree, int range, int mode)
 	mutex_lock(&rotlock_mutex);
 	list_add(&(mylock->list), mode==ROTLOCK_MODE_READ?wait_node_list_read.prev:wait_node_list_write.prev);
 	mutex_unlock(&rotlock_mutex);
-	printk("[rotation] After list_add in lock (%d %d %d)\n", degree, range, mode);
 // ??? can wrong thread wakeup occurs
 	find_available();
 	printk("[rotation] After find_avaliable in lock (%d %d %d)\n", degree, range, mode);
@@ -184,15 +199,21 @@ static int unlock(int degree, int range, int mode)
 	if(validate_range(degree, range) == 0) return -EINVAL;
 	
 	mutex_lock(&rotlock_mutex);
+	printk("[rotation] After mutex_lock in unlock (%d %d %d)\n", degree, range, mode);
 
 	list_for_each_entry(node, acc_node_list_this_mode, list){
 		// check this unlock equals to node
+		printk("[rotation] node info!! %d %d %d in unlock\n", node->degree, node->range, node->mode);
 		if(node->degree == degree &&
 		 node->range == range &&
 		 node->proc == current &&
-		 node->mode == mode ) break;
+		 node->mode == mode ) 
+			break;
+		
 	}
+	printk("[rotation] After list_for in unlock (%d %d %d)\n", degree, range, mode);
 	if(&(node->list) == acc_node_list_this_mode){
+		printk("[rotation] If inscope in unlock (%d %d %d)\n", degree, range, mode);
 		mutex_unlock(&rotlock_mutex);
 		return -EINVAL; // return error
 	}
@@ -200,10 +221,12 @@ static int unlock(int degree, int range, int mode)
 	for_each_in_range(node->degree, node->range, i, degree_now){
 		(mode == ROTLOCK_MODE_READ?read_acc_chk:write_acc_chk)[degree_now]--;
 	}
+	printk("[rotation] After for_each in unlock (%d %d %d)\n", degree, range, mode);
 	// remove from wait_node_write
 	list_del(&(node->list));
 	kfree(node);
 	mutex_unlock(&rotlock_mutex);
+	printk("[rotation] After mutex_unlock in unlock (%d %d %d)\n", degree, range, mode);
 
 	find_available();
 	return 0;
@@ -211,6 +234,7 @@ static int unlock(int degree, int range, int mode)
 
 void exit_rotlock(struct task_struct *tsk)
 {
+	return;
 	struct lock_info *node, *temp_lock_info;
 	int i, degree_now;
 
