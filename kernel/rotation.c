@@ -142,6 +142,7 @@ static int find_available(void)
 
 static int lock(int degree, int range, int mode)
 {
+	int err;
 	struct lock_info *mylock;
 
 	if(validate_range(degree, range) == 0) return -EINVAL;
@@ -170,7 +171,8 @@ static int lock(int degree, int range, int mode)
 	} 
 	// else err == 0, get lock and return*/
 	
-	wait_for_completion(&(mylock->comp));
+	err = wait_for_completion_killable(&(mylock->comp));
+	if(err < 0) return -EINTR;
 	printk("[rotation] After wait_for_completion in lock (%d %d %d)\n", degree, range, mode);
 	return 0;
 }
