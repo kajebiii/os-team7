@@ -217,6 +217,7 @@ void exit_rotlock(struct task_struct *tsk)
 {
 	struct lock_info *node, *temp_lock_info;
 	int i, degree_now;
+	int check_deleted = 0;
 
 	mutex_lock(&rotlock_mutex);
 
@@ -224,6 +225,7 @@ void exit_rotlock(struct task_struct *tsk)
 	list_for_each_entry_safe(node, temp_lock_info, &acc_node_list_read, list){
 		// check this unlock equals to node
 		if(node->proc == tsk){
+			check_deleted = 1;
 			for_each_in_range(node->degree, node->range, i, degree_now)
 				read_acc_chk[degree_now]--;
 			list_del(&(node->list));
@@ -235,6 +237,7 @@ void exit_rotlock(struct task_struct *tsk)
 	list_for_each_entry_safe(node, temp_lock_info, &acc_node_list_write, list){
 		// check this unlock equals to node
 		if(node->proc == tsk){
+			check_deleted = 1;
 			for_each_in_range(node->degree, node->range, i, degree_now)
 				write_acc_chk[degree_now]--;
 			list_del(&(node->list));
@@ -246,6 +249,7 @@ void exit_rotlock(struct task_struct *tsk)
 	list_for_each_entry_safe(node, temp_lock_info, &wait_node_list_read, list){
 		// check this unlock equals to node
 		if(node->proc == tsk){
+			check_deleted = 1;
 			list_del(&(node->list));
 			kfree(node);
 		}
@@ -255,13 +259,15 @@ void exit_rotlock(struct task_struct *tsk)
 	list_for_each_entry_safe(node, temp_lock_info, &wait_node_list_write, list){
 		// check this unlock equals to node
 		if(node->proc == tsk){
+			check_deleted = 1;
 			list_del(&(node->list));
 			kfree(node);
 		}
 	}
 
 	mutex_unlock(&rotlock_mutex);
-	find_available();
+	if(check_deleted)
+		find_available();
 }
 
 SYSCALL_DEFINE1(set_rotation, int, degree)
