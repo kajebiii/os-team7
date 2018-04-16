@@ -47,10 +47,10 @@ Then type `make run`, will show result of our test code(ptree) and result of `ps
 		* Input: int degree, int range (User wants to get write lock for [degree-range, degree+range].)
 		* Output: 0 for successful lock, -EINVAL for invalid range.
 	- rotunlock_read: Unlock read lock for designated angle range.
-		* Input: int degree, int range (User wants to get read lock for [degree-range, degree+range].)
+		* Input: int degree, int range (User wants to release read lock for [degree-range, degree+range].)
 		* Output: 0 for successful unlock, -EINVAL for invalid range / Non locked range.
 	- rotunlock_write: Unlock write lock for designated angle range.
-		* Input: int degree, int range (User wants to get write lock for [degree-range, degree+range].)
+		* Input: int degree, int range (User wants to release write lock for [degree-range, degree+range].)
 		* Output: 0 for successful unlock, -EINVAL for invalid range / Not locked range.
 
 * What system call does (set_rotation):
