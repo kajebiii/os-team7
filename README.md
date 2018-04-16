@@ -70,6 +70,32 @@ Then type `make run`, will show result of our test code(ptree) and result of `ps
 	- Remove lock from each entry in the array.
 	- Find locks that became available by unlocking this lock, and returns 0.
 
+* lock_info struct 
+	- contains informations about lock
+	- contains completion
+
+* Completion
+	- FIFO semaphore
+	- resolve race condition
+	- call wait_for_completion when the task wants to acquire lock 
+	- wait_for_completion_interruptible()
+		* Wait for completion call
+		* returns -ERESTARTSYS when signal is pending
+		* return 0 when completion is called
+
+* Data structure
+	- Acquire check arrays
+		* write_acq_chk[i] : Number of of acquired write lock contains degree i
+		* read_acq_chk[i] : Number of of acquired read lock contains degree i
+	- Wait node list : linked list of wait locks
+	- Acquire node list : linked list of wait locks
+	- A mutex lock controls those data structures to prevent simultaneous accessing.
+
+* Finding acquirable lock
+	- policy
+		* write lock has higher priority
+		* Find waiting write lock contains current degree. If it can grab lock now, acquire write lock and return. If there are at least one waiting write lock contains current degree, do not acquire any waiting read lock. Otherwise, find waiting read lock contains current degree. If possible, acquire read lock immediately.
+
 * exit_rotlock: This function is always called when the process was terminated.
 	- Check whether there is waiting lock / acquired lock in each range. If so, delete those locks from queue.
 	- Find locks that became available by unlocking these locks, and gives them lock if possible.
