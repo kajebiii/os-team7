@@ -21,23 +21,76 @@ After logging in, you have to execute `direct_set_debug.sh --sdb-set` to enable 
 
 In the "test" folder, type `make clean` and `make`.
 
-Then type `make run`
+Then type `make run`, will show result of our test code(ptree) and result of `pstree 0`
 
 
-## [Comparing changes](https://github.com/swsnu/os-team7/compare/base...proj2)
+## [Comparing changes](https://github.com/swsnu/os-team7/compare/base...proj1)
 
 ## Preprocess
 * [arch/arm/include/asm/unistd.h]
 * [arch/arm/include/uapi/asm/unistd.h]
 * [arch/arm/kernel/calls.S]
+* [include/linux/prinfo.h]
 * [kernel/Makefile]
 
-## Something
-* Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-* Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?a
-* But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?
+## kernel/rotation.c
+* Used SYSCALL_DEFINE2 macro
+
+* There are 5 system calls in this file.
+	- set_rotation : Set the current rotation degree of the device.
+		* Input: int degree(rotation degree that user wants to set.) 
+		* Output: Return total # of wakeup lock, -EINVAL for invalid range.
+	- rotlock_read : Get read lock for designated angle range.
+		* Input: int degree, int range (User wants to get read lock for [degree-range, degree+range].)
+		* Output: 0 for successful lock, -EINVAL for invalid range.
+	- rotlock_write: Get write lock for designated angle range.
+		* Input: int degree, int range (User wants to get write lock for [degree-range, degree+range].)
+		* Output: 0 for successful lock, -EINVAL for invalid range.
+	- rotunlock_read: Unlock read lock for designated angle range.
+		* Input: int degree, int range (User wants to release read lock for [degree-range, degree+range].)
+		* Output: 0 for successful unlock, -EINVAL for invalid range / Non locked range.
+	- rotunlock_write: Unlock write lock for designated angle range.
+		* Input: int degree, int range (User wants to release write lock for [degree-range, degree+range].)
+		* Output: 0 for successful unlock, -EINVAL for invalid range / Not locked range.
+
+* What system call does (set_rotation):
+	- Check whether degree is valid.
+	- Get mutex for degree, and change SYSTEM_DEGREE value.
+	- Find available locks by waking up waiting reading/waiting locks.
+
+* What system call does (rotlock_read, rotlock_write)
+	- Check whether range is valid.
+	- Generate lock struct and store informations.
+	- Add the lock struct to waiting queue.
+	- Wait until gets the lock, and returns 0.
+
+* What system call does (rotunlock_read, rotunlock_write)
+	- Check whether range is valid.
+	- Check whether there is lock by caller process in range. If not, return -EINVAL.
+	- Remove lock from each entry in the array.
+	- Find locks that became available by unlocking this lock, and returns 0.
+
+* exit_rotlock: This function is always called when the process was terminated.
+	- Check whether there is waiting lock / acquired lock in each range. If so, delete those locks from queue.
+	- Find locks that became available by unlocking these locks, and gives them lock if possible.
+
+## test/selector.c
+* What test code does:
+	- Get write rotation lock for range [0,180].
+	- Open file and write integer to that file.
+	- Unlock write rotation lock.
+	- Increment integer by one, sleep for one second, and repeat above process.
+
+## test/trial.c
+* What test code does:
+	- Get read lock for range [0,180].
+	- Open file and read integer from that file.
+	- Calculates factorization result for the integer.
+	- Print the result, and unlock read lock.
+	- Sleep for one second, and repeat above process.
 
 ## Any lessons learned
-* To do
-* To do
-* To do
+* We learned how to use mutex to prevent concurrency issues. We learned about lots of concurrency issues such as race condition, deadlock, and so on. We figured out how to handle those issues properly in kernel code.
+* We learned how to handle starvation issues for locks. We learned that write starvation can occur because of lots of read locks, and it should be handled by giving some priority to waiting write locks.
+* We learned how to make processes wait in valid way. We learned that process should not just sleep, and they should be waked up when the conditions are fulfilled. We learned how to make processes wait in valid way, not making the kernel to crash.
+* We learned about exit function, which should be called at the termination of process. We learned that process can always be terminated in appropriate/inappropriate way, and exit function should handle them in a valid way. We handled those cases in exit_rotlock function.
