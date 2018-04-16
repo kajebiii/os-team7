@@ -75,7 +75,6 @@
 #include <linux/blkdev.h>
 #include <linux/elevator.h>
 #include <linux/random.h>
-#include <linux/rotation.h>
 
 #include <asm/io.h>
 #include <asm/bugs.h>
