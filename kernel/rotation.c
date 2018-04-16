@@ -38,17 +38,11 @@ struct lock_info{
 
 static LIST_HEAD(wait_node_list_read);
 static LIST_HEAD(wait_node_list_write);
-static LIST_HEAD(acc_node_list_read);
-static LIST_HEAD(acc_node_list_write);
+static LIST_HEAD(acq_node_list_read);
+static LIST_HEAD(acq_node_list_write);
 
-static int write_acc_chk[360];
-static int read_acc_chk[360];
-
-/*
-	ISSUE
-	mutex to spinlock?
-	call find_avaialbe in lock?
-*/
+static int write_acq_chk[360];
+static int read_acq_chk[360];
 
 // get distance between x and y in circular case
 static inline int get_dist(int x, int y)
@@ -74,15 +68,18 @@ static inline int validate_range(int center, int range){
 	return 1;
 }
 
-// return total # of wakeup lock
+/**
+ * static long find_available(void)
+ * return total # of wakeup lock
+ * must call inside rotlock_mutex
+ * unlock mutex before return
+ */
 static long find_available(void)
 {
 	struct lock_info *iter, *temp_node_iter;
 	int i, center, range, degree_now;
 	int write_in_degree;
-	int count_accquired_readlock = 0;
-
-	mutex_lock(&rotlock_mutex);
+	int count_acquired_readlock = 0;
 
 	write_in_degree = 0;
 	list_for_each_entry_safe(iter, temp_node_iter, &wait_node_list_write, list){
@@ -92,16 +89,16 @@ static long find_available(void)
 		write_in_degree = 1;
 		// check for curret iter
 		for_each_in_range(center, range, i, degree_now){
-			if(write_acc_chk[degree_now] > 0) break;
-			if(read_acc_chk[degree_now] > 0) break;
+			if(write_acq_chk[degree_now] > 0) break;
+			if(read_acq_chk[degree_now] > 0) break;
 		}
 		if(i == range+1){
-			// edit write_acc
+			// edit write_acq
 			for_each_in_range(center, range, i, degree_now)
-				write_acc_chk[degree_now]++;
+				write_acq_chk[degree_now]++;
 			// remove from wait_node_write
 			list_del(&(iter->list));
-			list_add_tail(&(iter->list), &acc_node_list_write);
+			list_add_tail(&(iter->list), &acq_node_list_write);
 			complete(&(iter->comp));
 			mutex_unlock(&rotlock_mutex);
 			return 1;
@@ -120,23 +117,23 @@ static long find_available(void)
 		if(!check_in_range(center, range, SYSTEM_DEGREE)) continue;
 		// check for curret iter
 		for_each_in_range(center, range, i, degree_now){
-			if(write_acc_chk[degree_now] > 0) break;
+			if(write_acq_chk[degree_now] > 0) break;
 		}
 		if(i == range+1){
-			// edit read_acc
+			// edit read_acq
 			for_each_in_range(center, range, i, degree_now){
-				read_acc_chk[degree_now]++;
+				read_acq_chk[degree_now]++;
 			}
 			// remove from wait_node_write
 			list_del(&(iter->list));
-			list_add_tail(&(iter->list), &acc_node_list_read);
+			list_add_tail(&(iter->list), &acq_node_list_read);
 			complete(&(iter->comp));
-			count_accquired_readlock++;
+			count_acquired_readlock++;
 		}
 	}
 
 	mutex_unlock(&rotlock_mutex);
-	return count_accquired_readlock;
+	return count_acquired_readlock;
 }
 
 static long rotlock_wait_restart(struct restart_block *restart);
@@ -167,17 +164,16 @@ static long lock(int degree, int range, int mode)
 
 	// make waitnode struct
 	mylock = kmalloc(sizeof(struct lock_info), GFP_KERNEL);
+	if(!mylock) return -ENOMEM;
 	mylock->degree = degree;
 	mylock->range = range;
 	mylock->mode = mode;
 	mylock->proc = current;
 	init_completion(&(mylock->comp));
 
-	// accquire lock
+	// acquire lock
 	mutex_lock(&rotlock_mutex);
 	list_add_tail(&(mylock->list), mode==ROTLOCK_MODE_READ?(&wait_node_list_read):(&wait_node_list_write));
-	mutex_unlock(&rotlock_mutex);
-// ??? can wrong thread wakeup occurs
 	find_available();
 	
 	return rotlock_wait(&(mylock->comp));
@@ -187,13 +183,13 @@ static long unlock(int degree, int range, int mode)
 {
 	struct lock_info *node;
 	int degree_now, i;
-	struct list_head* acc_node_list_this_mode = (mode == ROTLOCK_MODE_READ?(&acc_node_list_read):(&acc_node_list_write));
+	struct list_head* acq_node_list_this_mode = (mode == ROTLOCK_MODE_READ?(&acq_node_list_read):(&acq_node_list_write));
 
 	if(validate_range(degree, range) == 0) return -EINVAL;
 	
 	mutex_lock(&rotlock_mutex);
 
-	list_for_each_entry(node, acc_node_list_this_mode, list){
+	list_for_each_entry(node, acq_node_list_this_mode, list){
 		// check this unlock equals to node
 		if(node->degree == degree &&
 		 node->range == range &&
@@ -202,18 +198,17 @@ static long unlock(int degree, int range, int mode)
 			break;
 		
 	}
-	if(&(node->list) == acc_node_list_this_mode){
+	if(&(node->list) == acq_node_list_this_mode){
 		mutex_unlock(&rotlock_mutex);
 		return -EINVAL; // return error
 	}
-	// remove from read_acc
+	// remove from read_acq
 	for_each_in_range(node->degree, node->range, i, degree_now){
-		(mode == ROTLOCK_MODE_READ?read_acc_chk:write_acc_chk)[degree_now]--;
+		(mode == ROTLOCK_MODE_READ?read_acq_chk:write_acq_chk)[degree_now]--;
 	}
 	// remove from wait_node_write
 	list_del(&(node->list));
 	kfree(node);
-	mutex_unlock(&rotlock_mutex);
 
 	find_available();
 	return 0;
@@ -227,25 +222,25 @@ void exit_rotlock(struct task_struct *tsk)
 
 	mutex_lock(&rotlock_mutex);
 
-	// remove all accquired read lock of task
-	list_for_each_entry_safe(node, temp_lock_info, &acc_node_list_read, list){
+	// remove all acquired read lock of task
+	list_for_each_entry_safe(node, temp_lock_info, &acq_node_list_read, list){
 		// check this unlock equals to node
 		if(node->proc == tsk){
 			check_deleted = 1;
 			for_each_in_range(node->degree, node->range, i, degree_now)
-				read_acc_chk[degree_now]--;
+				read_acq_chk[degree_now]--;
 			list_del(&(node->list));
 			kfree(node);
 		}
 	}
 
-	// remove all accquired write lock of task
-	list_for_each_entry_safe(node, temp_lock_info, &acc_node_list_write, list){
+	// remove all acquired write lock of task
+	list_for_each_entry_safe(node, temp_lock_info, &acq_node_list_write, list){
 		// check this unlock equals to node
 		if(node->proc == tsk){
 			check_deleted = 1;
 			for_each_in_range(node->degree, node->range, i, degree_now)
-				write_acc_chk[degree_now]--;
+				write_acq_chk[degree_now]--;
 			list_del(&(node->list));
 			kfree(node);
 		}
@@ -271,9 +266,9 @@ void exit_rotlock(struct task_struct *tsk)
 		}
 	}
 
-	mutex_unlock(&rotlock_mutex);
 	if(check_deleted)
 		find_available();
+	else mutex_unlock(&rotlock_mutex);
 }
 
 SYSCALL_DEFINE1(set_rotation, int, degree)
@@ -282,7 +277,6 @@ SYSCALL_DEFINE1(set_rotation, int, degree)
 		return -EINVAL;
 	mutex_lock(&rotlock_mutex);
 	SYSTEM_DEGREE = degree;
-	mutex_unlock(&rotlock_mutex);
 	return find_available();
 }
 
