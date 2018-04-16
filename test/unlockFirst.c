@@ -23,7 +23,7 @@ int main(int argc, char *argv[]){
 		printf("[INTEGER IDENTIFIER] must be large than or equal to 0");
 		return 0;
 	}
-	printf("W : %ld\n", syscall(SYSCALL_ROTUNLOCK_WRITE, 90, 90));
+	printf("WL : %ld\n", syscall(SYSCALL_ROTLOCK_WRITE, 180, 2));
 	printf("RL : %ld\n", syscall(SYSCALL_ROTLOCK_READ, 90, 1));
 	printf("R : %ld\n", syscall(SYSCALL_ROTUNLOCK_READ, 90, 90));
 	printf("RL : %ld\n", syscall(SYSCALL_ROTLOCK_READ, 90, 2));

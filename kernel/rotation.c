@@ -277,25 +277,30 @@ SYSCALL_DEFINE1(set_rotation, int, degree)
 		return -EINVAL;
 	mutex_lock(&rotlock_mutex);
 	SYSTEM_DEGREE = degree;
+	printk("[rotation] SET_ROTATION    Degree : %3d\n", degree);
 	return find_available();
 }
 
 SYSCALL_DEFINE2(rotlock_read, int, degree, int, range)
 {
+	printk("[rotation] ROTLOCK_READ    Degree : %3d, Range : %3d\n", degree, range);
 	return lock(degree, range, ROTLOCK_MODE_READ);
 }
 
 SYSCALL_DEFINE2(rotlock_write, int, degree, int, range)
 {
+	printk("[rotation] ROTLOCK_WRITE   Degree : %3d, Range : %3d\n", degree, range);
 	return lock(degree, range, ROTLOCK_MODE_WRITE);
 }
 
 SYSCALL_DEFINE2(rotunlock_read, int, degree, int, range)
 {
+	printk("[rotation] ROTUNLOCK_READ  Degree : %3d, Range : %3d\n", degree, range);
 	return unlock(degree, range, ROTLOCK_MODE_READ);
 }
 
 SYSCALL_DEFINE2(rotunlock_write, int, degree, int, range)
 {
+	printk("[rotation] ROTUNLOCK_WRITE Degree : %3d, Range : %3d\n", degree, range);
 	return unlock(degree, range, ROTLOCK_MODE_WRITE);
 }
