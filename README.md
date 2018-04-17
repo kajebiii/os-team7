@@ -17,11 +17,42 @@ After the building is done.
 Just type `lthor image.tar` in the root folder, or `make lthor` in the "test" folder.
 
 ## How to execute test code
-After logging in, you have to execute `direct_set_debug.sh --sdb-set` to enable sdb.
+```bash
+HOST$ XXX
+```
+* Type XXX at the terminal of your Ubuntu-PC.
 
-In the "test" folder, type `make clean` and `make`.
+```bash
+BOARD$ YYY
+```
+* Type YYY at the terminal of Artik 10.
 
-Then type `make run`, will show result of our test code(ptree) and result of `pstree 0`
+After logging in, you have to execute 
+```bash
+BOARD$ direct_set_debug.sh --sdb-set
+```
+to enable sdb.
+
+In the "test" folder, type 
+```bash
+HOST$ make clean
+HOST$ make
+HOST$ make run
+```
+to transfer out test excutable files between the device and your PC.
+
+```bash
+HOST$ sdb shell
+HOST$ (sdb) > /root/selector [STARTING INTEGER]
+```
+Above command will execute `selector`. 
+```bash
+HOST$ sdb shell
+HOST$ (sdb) > /root/trial [INTERGER IDENTIFIER]
+```
+Above command will execute `trial`.
+
+You will need to open two or many terinel.
 
 
 ## [Comparing changes](https://github.com/swsnu/os-team7/compare/base...proj1)

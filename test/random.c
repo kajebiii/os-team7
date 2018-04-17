@@ -24,7 +24,7 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
     while(1){
-		int a = rand()%360, b = rand()%179 + 1;
+		int a = rand()%360, b = rand()%165 + 15;
 		syscall(SYSCALL_ROTLOCK_READ, a, b);
 		printf("[%d %d]\n", a, b);
 		syscall(SYSCALL_ROTUNLOCK_READ, a, b);
