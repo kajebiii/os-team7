@@ -20,18 +20,22 @@ Just type `lthor image.tar` in the root folder, or `make lthor` in the "test" fo
 ```bash
 HOST$ XXX
 ```
-* Type XXX at the terminal of your Ubuntu-PC.
+* It means "type XXX at the terminal of your Ubuntu-PC."
 
 ```bash
 BOARD$ YYY
 ```
-* Type YYY at the terminal of Artik 10.
+* It means "Type YYY at the terminal of Artik 10."
 
 After logging in, you have to execute 
 ```bash
 BOARD$ direct_set_debug.sh --sdb-set
 ```
-to enable sdb.
+to enable sdb. And if you execute
+```bash
+BOARD$ cat /proc/kmsg | grep "rotation"
+```
+above command, you can see our logs in rotation.c
 
 In the "test" folder, type 
 ```bash
@@ -39,7 +43,7 @@ HOST$ make clean
 HOST$ make
 HOST$ make run
 ```
-to transfer out test excutable files between the device and your PC.
+Then, It will compile test codes and transfer our test excutable files between the device and your PC.
 
 ```bash
 HOST$ sdb shell
@@ -52,7 +56,7 @@ HOST$ (sdb) > /root/trial [INTERGER IDENTIFIER]
 ```
 Above command will execute `trial`.
 
-You will need to open two or many terinel.
+You will need to open two or many terminal.
 
 
 ## [Comparing changes](https://github.com/swsnu/os-team7/compare/base...proj1)
