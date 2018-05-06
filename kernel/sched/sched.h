@@ -358,6 +358,10 @@ struct rt_rq {
 #endif
 };
 
+struct wrr_rq {
+	//
+};
+
 #ifdef CONFIG_SMP
 
 /*
@@ -422,6 +426,7 @@ struct rq {
 
 	struct cfs_rq cfs;
 	struct rt_rq rt;
+	struct wrr_rq wrr;
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
 	/* list of leaf cfs_rq on this cpu: */
