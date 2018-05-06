@@ -1717,6 +1717,7 @@ void sched_fork(struct task_struct *p)
 		p->sched_reset_on_fork = 0;
 	}
 
+	// hi~
 	if (!rt_prio(p->prio))
 		p->sched_class = &fair_sched_class;
 
@@ -3879,6 +3880,7 @@ static bool check_same_owner(struct task_struct *p)
 	return match;
 }
 
+// TODO: We should do something here
 static int __sched_setscheduler(struct task_struct *p, int policy,
 				const struct sched_param *param, bool user)
 {
@@ -7108,6 +7110,7 @@ void __init sched_init(void)
 	/*
 	 * During early bootup we pretend to be a normal task:
 	 */
+	// TODO: Maybe modify???
 	current->sched_class = &fair_sched_class;
 
 #ifdef CONFIG_SMP
