@@ -3,52 +3,51 @@
 #include "sched.h"
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-    //
+    // add task to runqueue
 }
 
 void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-    //
+    // remove task to runqueue
 }
 
 void yield_task_wrr (struct rq *rq){
-    //
+    // yield task
 }
 
 void check_preempt_curr_wrr (struct rq *rq, struct task_struct *p, int flags){
-	//
+	// 
 }
 
-struct task_struct* pick_next_task_wrr (struct rq *rq)
-{
-	//
+struct task_struct* pick_next_task_wrr (struct rq *rq){
+	// pick next task to run
 }
 
 void put_prev_task_wrr (struct rq *rq, struct task_struct *p){
-	//
+	// push task to end
 }
 
 int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
-	//
+	// find cpu of task ??? passive load balance
 }
 
 void set_curr_task_wrr (struct rq *rq){
-	//
+	// something changed
 }
 
 void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
-	//
+	// call each task tick
 }
 
 void switched_to_wrr (struct rq *this_rq, struct task_struct *task){
-	//
+	// task's rq changed to wrr
 }
 
 void prio_changed_wrr (struct rq *this_rq, struct task_struct *task, int oldprio){
-	//
+	// task's prio changed
 }
 
 unsigned int get_rr_interval_wrr (struct rq *rq, struct task_struct *task){
-	//
+	// round robin??
 }
 
 
