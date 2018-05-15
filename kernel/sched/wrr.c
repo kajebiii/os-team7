@@ -99,14 +99,21 @@ void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 
 void switched_to_wrr (struct rq *this_rq, struct task_struct *task){
 	// task's rq changed to wrr
+	// Nothing to do here :)
+	return;
 }
 
 void prio_changed_wrr (struct rq *this_rq, struct task_struct *task, int oldprio){
 	// task's prio changed
+	// Nothing to do here :)
+	return;
 }
 
 unsigned int get_rr_interval_wrr (struct rq *rq, struct task_struct *task){
 	// round robin??
+	// TODO: What??
+	struct sched_wrr_entity *wrr = &task->wrr;
+	return wrr->time_slice;
 }
 
 
