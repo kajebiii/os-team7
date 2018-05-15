@@ -3,6 +3,10 @@
 #include <linux/list.h>
 #include "sched.h"
 
+void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
+	INIT_LIST_HEAD(&(wrr_rq->run_list));
+}
+
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
     list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 }
