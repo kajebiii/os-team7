@@ -1,9 +1,10 @@
 #include <linux/syscalls.h>
 #include <linux/sched.h>
+#include <linux/list.h>
 #include "sched.h"
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-    // add task to runqueue
+	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 }
 
 void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
