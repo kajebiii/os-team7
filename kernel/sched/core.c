@@ -3658,8 +3658,11 @@ void rt_mutex_setprio(struct task_struct *p, int prio)
 		dequeue_task(rq, p, 0);
 	if (running)
 		p->sched_class->put_prev_task(rq, p);
-
-	if (rt_prio(prio))
+	
+	
+	if(p->policy == SCHED_WRR){
+		p->sched_class = &wrr_sched_class;
+	}if (rt_prio(prio))
 		p->sched_class = &rt_sched_class;
 	else
 		p->sched_class = &fair_sched_class;
@@ -7115,7 +7118,7 @@ void __init sched_init(void)
 	 * During early bootup we pretend to be a normal task:
 	 */
 	// TODO: Maybe modify???
-	current->sched_class = &fair_sched_class;
+	current->sched_class = &wrr_sched_class;
 
 #ifdef CONFIG_SMP
 	zalloc_cpumask_var(&sched_domains_tmpmask, GFP_NOWAIT);

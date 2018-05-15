@@ -18,7 +18,9 @@ void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
 
 void yield_task_wrr (struct rq *rq){
     // yield task
-	list_move_tail(&(current->wrr.run_list), &(rq->wrr.run_list));
+	list_move_tail(&(rq->curr->wrr.run_list), &(rq->wrr.run_list));
+	//???
+	//list_move_tail(&(current->wrr.run_list), &(rq->wrr.run_list));
 }
 
 void check_preempt_curr_wrr (struct rq *rq, struct task_struct *p, int flags){
@@ -39,6 +41,7 @@ struct task_struct* pick_next_task_wrr (struct rq *rq){
 	struct wrr_rq *wrr_rq = &rq->wrr;
 	struct sched_wrr_entity *wrr_entity = list_first_entry_or_null(&(wrr_rq->run_list), struct sched_wrr_entity, run_list);
 	if(wrr_entity == NULL) return NULL;
+	wrr_entity->time_slice = wrr_entity->weight * HZ / 100;
 	return wrr_task_of(wrr_entity);
 	// pick next task to run
 }
@@ -120,48 +123,39 @@ unsigned int get_rr_interval_wrr (struct rq *rq, struct task_struct *task){
 	return wrr->time_slice;
 }
 
-
-const struct sched_class wrr_sched_class = {
-    .next = &fair_sched_class,
-    .enqueue_task = enqueue_task_wrr,
-    .dequeue_task = dequeue_task_wrr,
-    .yield_task = yield_task_wrr,
-    .yield_to_task = NULL,
-
-	.check_preempt_curr = check_preempt_curr,
-
-	.pick_next_task = pick_next_task_wrr,
-	.put_prev_task = put_prev_task_wrr,
+bool yield_to_task_wrr (struct rq *rq, struct task_struct *p, bool preempt){
+	return false;
+}
 #ifdef CONFIG_SMP
-	.select_task_rq = select_task_rq_wrr,
-	.migrate_task_rq = NULL,
+void migrate_task_rq_wrr(struct task_struct *p, int next_cpu) {
+}
 
-	.pre_schedule = NULL,
-	.post_schedule = NULL,
-	.task_waking = NULL,
-	.task_woken = NULL,
-
-	.set_cpus_allowed = NULL,
-
-	.rq_online = NULL,
-	.rq_offline = NULL,
+void pre_schedule_wrr(struct rq *this_rq, struct task_struct *task) {
+}
+void post_schedule_wrr(struct rq *this_rq) {
+}
+void task_waking_wrr(struct task_struct *task) {
+}
+void task_woken_wrr(struct rq *this_rq, struct task_struct *task) {
+}
+void set_cpus_allowed_wrr(struct task_struct *p, const struct cpumask *newmask) {
+}
+void rq_online_wrr(struct rq *rq) {
+}
+void rq_offline_wrr(struct rq *rq) {
+}
 #endif
-	.set_curr_task = set_curr_task_wrr,
-	.task_tick = task_tick_wrr,
-	.task_fork = NULL,
-	
-	.switched_from = NULL,
-	.switched_to = switched_to_wrr,
-	.prio_changed = prio_changed_wrr,
+void task_fork_wrr (struct task_struct *p) {
+}
 
-	.get_rr_interval = get_rr_interval_wrr,
+void switched_from_wrr (struct rq *this_rq, struct task_struct *task) {
+}
+
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
-	.task_move_group = NULL
+void task_move_group_wrr (struct task_struct *p, int on_rq) {
+}
 #endif
-};
-
-
 /*
 
 	bool yield_to_task_wrr (struct rq *rq, struct task_struct *p, bool preempt){
@@ -190,6 +184,48 @@ const struct sched_class wrr_sched_class = {
 	void (*task_move_group) (struct task_struct *p, int on_rq);
 #endif
 */
+
+const struct sched_class wrr_sched_class = {
+    .next = &fair_sched_class,
+    .enqueue_task = enqueue_task_wrr,
+    .dequeue_task = dequeue_task_wrr,
+    .yield_task = yield_task_wrr,
+    .yield_to_task = yield_to_task_wrr, //NULL,
+
+	.check_preempt_curr = check_preempt_curr,
+
+	.pick_next_task = pick_next_task_wrr,
+	.put_prev_task = put_prev_task_wrr,
+#ifdef CONFIG_SMP
+	.select_task_rq = select_task_rq_wrr,
+	.migrate_task_rq = migrate_task_rq_wrr, //NULL,
+
+	.pre_schedule = pre_schedule_wrr, //NULL,
+	.post_schedule = post_schedule_wrr, //NULL,
+	.task_waking = task_waking_wrr, //NULL,
+	.task_woken = task_woken_wrr, //NULL,
+
+	.set_cpus_allowed = set_cpus_allowed_wrr, //NULL,
+
+	.rq_online = rq_online_wrr, //NULL,
+	.rq_offline = rq_offline_wrr, //NULL,
+#endif
+	.set_curr_task = set_curr_task_wrr,
+	.task_tick = task_tick_wrr,
+	.task_fork = task_fork_wrr, //NULL,
+	
+	.switched_from = switched_from_wrr, //NULL,
+	.switched_to = switched_to_wrr,
+	.prio_changed = prio_changed_wrr,
+
+	.get_rr_interval = get_rr_interval_wrr,
+
+#ifdef CONFIG_FAIR_GROUP_SCHED
+	.task_move_group = task_move_group_wrr//NULL
+#endif
+};
+
+
 
 SYSCALL_DEFINE2(sched_setweight, pid_t, pid, int, weight){
 	return 0;
