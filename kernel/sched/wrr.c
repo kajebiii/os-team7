@@ -62,11 +62,13 @@ void set_curr_task_wrr (struct rq *rq){
 	// something changed
 }
 
+void update_curr_wrr(struct rq *rq) {
+	// TODO: How to update_curr_wrr?
+}
 void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 	struct sched_wrr_entity *wrr_se = &p->wrr;
 
-	// TODO: How to update_curr_wrr?
-	//update_curr_wrr(rq);
+	update_curr_wrr(rq);
 
 	/*
 	 * WRR tasks need a special form of timeslice management.
@@ -86,11 +88,9 @@ void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 	 */
 
 	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
-		// TODO: How to requeue_task?
-        /*
-    		requeue_task_wrr(rq, p, 0);
-	    	set_tsk_need_resched(p);
-        */
+		dequeue_task_wrr(rq, p, 0);
+		enqueue_task_wrr(rq, p, 0);
+	    set_tsk_need_resched(p);
 		return;
 	}
 }
