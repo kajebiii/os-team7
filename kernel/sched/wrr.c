@@ -67,10 +67,11 @@ void set_curr_task_wrr (struct rq *rq){
 void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 	struct sched_wrr_entity *wrr_se = &p->wrr;
 
+	// TODO: How to update_curr_wrr?
 	//update_curr_wrr(rq);
 
 	/*
-	 * RR tasks need a special form of timeslice management.
+	 * WRR tasks need a special form of timeslice management.
 	 * FIFO tasks have no timeslices.
 	 */
 	if (p->policy != SCHED_WRR)
@@ -87,8 +88,9 @@ void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 	 */
 
 	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
+		// TODO: How to requeue_task?
         /*
-    		requeue_task_rt(rq, p, 0);
+    		requeue_task_wrr(rq, p, 0);
 	    	set_tsk_need_resched(p);
         */
 		return;
