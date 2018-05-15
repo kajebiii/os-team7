@@ -13,6 +13,7 @@ void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
 }
 
 void yield_task_wrr (struct rq *rq){
+	
     // yield task
 }
 
@@ -20,7 +21,20 @@ void check_preempt_curr_wrr (struct rq *rq, struct task_struct *p, int flags){
 	// 
 }
 
+static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
+{
+	/*
+#ifdef CONFIG_SCHED_DEBUG
+	WARN_ON_ONCE(!rt_entity_is_task(rt_se));
+#endif
+	*/
+	return container_of(wrr_se, struct task_struct, wrr);
+}
+
 struct task_struct* pick_next_task_wrr (struct rq *rq){
+	struct wrr_rq *wrr_rq = &rq->wrr;
+	struct sched_wrr_entity *wrr_entity = list_first_entry_or_null(&(wrr_rq->run_list), struct sched_wrr_entity, run_list);
+	return wrr_task_of(wrr_entity);
 	// pick next task to run
 }
 
