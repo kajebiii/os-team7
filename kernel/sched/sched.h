@@ -359,7 +359,7 @@ struct rt_rq {
 };
 
 struct wrr_rq {
-	//
+	struct list_head run_list;
 };
 
 #ifdef CONFIG_SMP
