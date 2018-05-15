@@ -1056,6 +1056,7 @@ struct sched_rt_entity {
 
 struct sched_wrr_entity {
 	int weight;
+	struct list_head run_list;
 };
 
 struct rcu_node;
