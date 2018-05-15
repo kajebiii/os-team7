@@ -45,6 +45,7 @@ void put_prev_task_wrr (struct rq *rq, struct task_struct *p){
 	// push task to end
 }
 
+#ifdef CONFIG_SMP
 int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 	// find cpu of task ??? passive load balance
 	// TODO: passive load balance. Look for rt.c
@@ -57,6 +58,7 @@ int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 
 	return cpu;
 }
+#endif
 
 void set_curr_task_wrr (struct rq *rq){
 	// something changed
