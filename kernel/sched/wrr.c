@@ -13,8 +13,8 @@ void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
 }
 
 void yield_task_wrr (struct rq *rq){
-	
     // yield task
+	list_move_tail(&(current->wrr.run_list), &(rq->wrr.run_list));
 }
 
 void check_preempt_curr_wrr (struct rq *rq, struct task_struct *p, int flags){
