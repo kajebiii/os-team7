@@ -37,7 +37,34 @@ void set_curr_task_wrr (struct rq *rq){
 }
 
 void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
-	// call each task tick
+	struct sched_wrr_entity *wrr_se = &p->wrr;
+
+	//update_curr_wrr(rq);
+
+	/*
+	 * RR tasks need a special form of timeslice management.
+	 * FIFO tasks have no timeslices.
+	 */
+	if (p->policy != SCHED_WRR)
+		return;
+
+	if (--p->wrr.time_slice)
+		return;
+
+	p->wrr.time_slice = p->wrr.weight * HZ / 100;
+
+	/*
+	 * Requeue to the end of queue if we (and all of our ancestors) are the
+	 * only element on the queue
+	 */
+
+	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
+        /*
+    		requeue_task_rt(rq, p, 0);
+	    	set_tsk_need_resched(p);
+        */
+		return;
+	}
 }
 
 void switched_to_wrr (struct rq *this_rq, struct task_struct *task){
