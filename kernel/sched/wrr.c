@@ -17,7 +17,7 @@ void yield_task_wrr (struct rq *rq){
 }
 
 void check_preempt_curr_wrr (struct rq *rq, struct task_struct *p, int flags){
-	// 
+	return; 
 }
 
 struct task_struct* pick_next_task_wrr (struct rq *rq){
@@ -30,6 +30,15 @@ void put_prev_task_wrr (struct rq *rq, struct task_struct *p){
 
 int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 	// find cpu of task ??? passive load balance
+	// TODO: passive load balance. Look for rt.c
+
+	struct task_struct *curr;
+	struct rq *rq;
+	int cpu;
+
+	cpu = task_cpu(p);
+
+	return cpu;
 }
 
 void set_curr_task_wrr (struct rq *rq){
