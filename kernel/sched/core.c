@@ -1636,6 +1636,7 @@ static void __sched_fork(struct task_struct *p)
 #endif
 
 	INIT_LIST_HEAD(&p->rt.run_list);
+	INIT_LIST_HEAD(&p->wrr.run_list);
 
 #ifdef CONFIG_PREEMPT_NOTIFIERS
 	INIT_HLIST_HEAD(&p->preempt_notifiers);
@@ -4606,6 +4607,7 @@ SYSCALL_DEFINE1(sched_get_priority_max, int, policy)
 	case SCHED_NORMAL:
 	case SCHED_BATCH:
 	case SCHED_IDLE:
+	case SCHED_WRR:
 		ret = 0;
 		break;
 	}
@@ -4631,6 +4633,7 @@ SYSCALL_DEFINE1(sched_get_priority_min, int, policy)
 	case SCHED_NORMAL:
 	case SCHED_BATCH:
 	case SCHED_IDLE:
+	case SCHED_WRR:
 		ret = 0;
 	}
 	return ret;
