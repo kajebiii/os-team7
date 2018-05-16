@@ -3992,6 +3992,8 @@ recheck:
 	/*
 	 * If not changing anything there's no need to proceed further:
 	 */
+	if(p->policy || policy) 
+		printk("Running successfully: policy = %d, p->policy = %d\n", policy, p->policy);
 	if (unlikely(policy == p->policy && (!rt_policy(policy) ||
 			param->sched_priority == p->rt_priority))) {
 		task_rq_unlock(rq, p, &flags);
@@ -4019,6 +4021,7 @@ recheck:
 		task_rq_unlock(rq, p, &flags);
 		goto recheck;
 	}
+	printk("Running succesfully\n");
 	on_rq = p->on_rq;
 	running = task_current(rq, p);
 	if (on_rq)

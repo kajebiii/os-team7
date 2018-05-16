@@ -4,19 +4,36 @@
 #include "sched.h"
 
 void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
+	printk("init_wrr_rq visited\n");
+	if(wrr_rq == NULL) {
+		printk("init wrr_rq is NULL\n");
+	}
+	else {
+		printk("init wrr_rq is NOT NULL\n");
+	}
 	INIT_LIST_HEAD(&(wrr_rq->run_list));
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-    list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
+    printk("enqueue_task_wrr visited\n");
+	if(p == NULL) printk("WHAT??? enqueue???\n");
+	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
+	
+	inc_nr_running(rq);
 }
 
 void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
 	struct sched_wrr_entity *wrr = &p->wrr;
-	list_del(&(wrr->run_list));
+	
+	printk("dequeue_task_wrr visited\n");
+	if(wrr == NULL) printk("WHAT??? dequeue???\n");
+	list_del(&(wrr->run_list));	
+
+	dec_nr_running(rq);
 }
 
 void yield_task_wrr (struct rq *rq){
+	printk("yield_task_wrr visited\n");
     // yield task
 	list_move_tail(&(rq->curr->wrr.run_list), &(rq->wrr.run_list));
 	//???
@@ -24,11 +41,13 @@ void yield_task_wrr (struct rq *rq){
 }
 
 void check_preempt_curr_wrr (struct rq *rq, struct task_struct *p, int flags){
+	printk("check_preempt_curr_wrr visited\n");
 	return; 
 }
 
 static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
 {
+	printk("wrr_task_of visited\n");
 	/*
 #ifdef CONFIG_SCHED_DEBUG
 	WARN_ON_ONCE(!rt_entity_is_task(rt_se));
@@ -37,19 +56,30 @@ static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
 	return container_of(wrr_se, struct task_struct, wrr);
 }
 
+int mytusvalue = 0;
 struct task_struct* pick_next_task_wrr (struct rq *rq){
 	struct wrr_rq *wrr_rq = &rq->wrr;
 	struct sched_wrr_entity *wrr_entity = list_first_entry_or_null(&(wrr_rq->run_list), struct sched_wrr_entity, run_list);
-	if(wrr_entity == NULL) return NULL;
+	
+	//printk("pick_next_task_wrr visited\n");
+	if(wrr_entity == NULL) {
+		// This printk causes Kernel boot failure.
+		if(mytusvalue >= 60000 && mytusvalue % 1000 == 0) printk("WRR_ENTITY NULL in pick_next_task_wrr\n");
+
+		mytusvalue++;
+		return NULL;
+	}
+	printk("WRR_ENTITY NOT NULL in pick_next_task_wrr\n");
 	wrr_entity->time_slice = wrr_entity->weight * HZ / 100;
-	list_del(&(wrr_entity->run_list));
+	//list_del(&(wrr_entity->run_list));
 	return wrr_task_of(wrr_entity);
 	// pick next task to run
 }
 
 void put_prev_task_wrr (struct rq *rq, struct task_struct *p){
+	printk("put_prev_task_wrr visited\n");
 	printk("[WRR SCHEDULER] %x %x %x\n", &(p->wrr.run_list), p->wrr.run_list.next, p->wrr.run_list.prev);
-	enqueue_task_wrr(rq, p, 0);
+	//enqueue_task_wrr(rq, p, 0);
 	// push task to end
 }
 
@@ -62,6 +92,7 @@ int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 	struct rq *rq;
 	int cpu;
 
+	printk("select_task_rq_wrr visited\n");
 	cpu = task_cpu(p);
 
 	return cpu;
@@ -69,14 +100,18 @@ int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 #endif
 
 void set_curr_task_wrr (struct rq *rq){
+	printk("set_curr_task_wrr visited\n");
 	// something changed
 }
 
 void update_curr_wrr(struct rq *rq) {
 	// TODO: How to update_curr_wrr?
+	printk("update_curr_wrr visited\n");
 }
 void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 	struct sched_wrr_entity *wrr_se = &p->wrr;
+
+	printk("task_tick_wrr visited\n");
 
 	update_curr_wrr(rq);
 
@@ -90,7 +125,9 @@ void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 	if (--p->wrr.time_slice > 0)
 		return;
 
+	printk("Time slice became zero..\n");
 	p->wrr.time_slice = p->wrr.weight * HZ / 100;
+	printk("Next time slice = %d\n", p->wrr.time_slice);
 
 	/*
 	 * Requeue to the end of queue if we (and all of our ancestors) are the
@@ -106,12 +143,14 @@ void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 }
 
 void switched_to_wrr (struct rq *this_rq, struct task_struct *task){
+	printk("switched_to_wrr visited\n");
 	// task's rq changed to wrr
 	// Nothing to do here :)
 	return;
 }
 
 void prio_changed_wrr (struct rq *this_rq, struct task_struct *task, int oldprio){
+	printk("prio_change_wrr visited\n");
 	// task's prio changed
 	// Nothing to do here :)
 	return;
@@ -121,10 +160,13 @@ unsigned int get_rr_interval_wrr (struct rq *rq, struct task_struct *task){
 	// round robin??
 	// TODO: What??
 	struct sched_wrr_entity *wrr = &task->wrr;
+
+	printk("get_rr_interval_wrr visited\n");
 	return wrr->time_slice;
 }
 
 bool yield_to_task_wrr (struct rq *rq, struct task_struct *p, bool preempt){
+	printk("yield_to_task_wrr visited\n");
 	return false;
 }
 #ifdef CONFIG_SMP
