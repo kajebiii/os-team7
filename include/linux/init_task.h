@@ -168,8 +168,8 @@ extern struct task_group root_task_group;
 	.prio		= MAX_PRIO-20,					\
 	.static_prio	= MAX_PRIO-20,					\
 	.normal_prio	= MAX_PRIO-20,					\
-	/*.policy		= SCHED_NORMAL,*/					\
-	.policy		= SCHED_WRR,					\
+	.policy		= SCHED_NORMAL,					\
+	/*.policy		= SCHED_WRR,				*/	\
 	.cpus_allowed	= CPU_MASK_ALL,					\
 	.nr_cpus_allowed= NR_CPUS,					\
 	.mm		= NULL,						\
@@ -180,6 +180,11 @@ extern struct task_group root_task_group;
 	.rt		= {						\
 		.run_list	= LIST_HEAD_INIT(tsk.rt.run_list),	\
 		.time_slice	= RR_TIMESLICE,				\
+	},								\
+	.wrr = {						\
+		.run_list	= LIST_HEAD_INIT(tsk.wrr.run_list),	\
+		.time_slice = 100,			\
+		.weight = 10,			\
 	},								\
 	.tasks		= LIST_HEAD_INIT(tsk.tasks),			\
 	INIT_PUSHABLE_TASKS(tsk)					\

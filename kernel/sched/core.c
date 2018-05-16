@@ -1696,6 +1696,8 @@ void sched_fork(struct task_struct *p)
 	 */
 	p->prio = current->normal_prio;
 
+	p->wrr.weight = current->wrr.weight;
+
 	/*
 	 * Revert to default priority/policy on fork if requested.
 	 */
@@ -3662,7 +3664,8 @@ void rt_mutex_setprio(struct task_struct *p, int prio)
 	
 	if(p->policy == SCHED_WRR){
 		p->sched_class = &wrr_sched_class;
-	}if (rt_prio(prio))
+	}
+	else if (rt_prio(prio))
 		p->sched_class = &rt_sched_class;
 	else
 		p->sched_class = &fair_sched_class;
@@ -3918,17 +3921,19 @@ recheck:
 	 * 1..MAX_USER_RT_PRIO-1, valid priority for SCHED_NORMAL,
 	 * SCHED_BATCH and SCHED_IDLE is 0.
 	 */
-	if (param->sched_priority < 0 ||
-	    (p->mm && param->sched_priority > MAX_USER_RT_PRIO-1) ||
-	    (!p->mm && param->sched_priority > MAX_RT_PRIO-1))
-		return -EINVAL;
-	if (rt_policy(policy) != (param->sched_priority != 0))
-		return -EINVAL;
+	if(policy != SCHED_WRR){
+		if (param->sched_priority < 0 ||
+			(p->mm && param->sched_priority > MAX_USER_RT_PRIO-1) ||
+			(!p->mm && param->sched_priority > MAX_RT_PRIO-1))
+			return -EINVAL;
+		if (rt_policy(policy) != (param->sched_priority != 0))
+			return -EINVAL;
+	}
 
 	/*
 	 * Allow unprivileged RT tasks to decrease priority:
 	 */
-	if (user && !capable(CAP_SYS_NICE)) {
+	if (user && !capable(CAP_SYS_NICE) && policy != SCHED_WRR) {
 		if (rt_policy(policy)) {
 			unsigned long rlim_rtprio =
 					task_rlimit(p, RLIMIT_RTPRIO);
@@ -7118,7 +7123,8 @@ void __init sched_init(void)
 	 * During early bootup we pretend to be a normal task:
 	 */
 	// TODO: Maybe modify???
-	current->sched_class = &wrr_sched_class;
+	if(current->policy == SCHED_WRR) current->sched_class = &wrr_sched_class;
+	else current->sched_class = &fair_sched_class;
 
 #ifdef CONFIG_SMP
 	zalloc_cpumask_var(&sched_domains_tmpmask, GFP_NOWAIT);
