@@ -142,7 +142,7 @@ print_task(struct seq_file *m, struct rq *rq, struct task_struct *p)
 	SEQ_printf(m, " %s", task_group_path(task_group(p)));
 #endif
 
-	SEQ_printf(m, "%15d %15d", p->wrr->weight, p->wrr->timeslice);
+	SEQ_printf(m, "%15d", p->wrr.weight);
 
 	SEQ_printf(m, "\n");
 }
