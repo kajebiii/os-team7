@@ -142,6 +142,8 @@ print_task(struct seq_file *m, struct rq *rq, struct task_struct *p)
 	SEQ_printf(m, " %s", task_group_path(task_group(p)));
 #endif
 
+	SEQ_printf(m, "%15d %15d", p->wrr->weight, p->wrr->timeslice);
+
 	SEQ_printf(m, "\n");
 }
 
@@ -153,9 +155,9 @@ static void print_rq(struct seq_file *m, struct rq *rq, int rq_cpu)
 	SEQ_printf(m,
 	"\nrunnable tasks:\n"
 	"            task   PID         tree-key  switches  prio"
-	"     exec-runtime         sum-exec        sum-sleep\n"
+	"     exec-runtime         sum-exec        sum-sleep        wrr_weight      wrr_timeslice\n"
 	"------------------------------------------------------"
-	"----------------------------------------------------\n");
+	"-----------------------------------------------------------------------------------------\n");
 
 	read_lock_irqsave(&tasklist_lock, flags);
 
@@ -329,6 +331,8 @@ do {									\
 	spin_lock_irqsave(&sched_debug_lock, flags);
 	print_cfs_stats(m, cpu);
 	print_rt_stats(m, cpu);
+
+	SEQ_printf(m, "wrr_rq addr: %x\n", cpu_rq(cpu)->wrr);
 
 	rcu_read_lock();
 	print_rq(m, rq, cpu);
