@@ -42,12 +42,13 @@ struct task_struct* pick_next_task_wrr (struct rq *rq){
 	struct sched_wrr_entity *wrr_entity = list_first_entry_or_null(&(wrr_rq->run_list), struct sched_wrr_entity, run_list);
 	if(wrr_entity == NULL) return NULL;
 	wrr_entity->time_slice = wrr_entity->weight * HZ / 100;
+	list_del(&(wrr_entity->run_list));
 	return wrr_task_of(wrr_entity);
 	// pick next task to run
 }
 
 void put_prev_task_wrr (struct rq *rq, struct task_struct *p){
-	dequeue_task_wrr(rq, p, 0);
+	printk("[WRR SCHEDULER] %x %x %x\n", &(p->wrr.run_list), p->wrr.run_list.next, p->wrr.run_list.prev);
 	enqueue_task_wrr(rq, p, 0);
 	// push task to end
 }
@@ -86,7 +87,7 @@ void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 	if (p->policy != SCHED_WRR)
 		return;
 
-	if (--p->wrr.time_slice)
+	if (--p->wrr.time_slice > 0)
 		return;
 
 	p->wrr.time_slice = p->wrr.weight * HZ / 100;
