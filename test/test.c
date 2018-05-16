@@ -13,7 +13,7 @@ int main(){
     struct sched_param param;
     param.sched_priority = 50;
 
-    sched_setscheduler(0, 6, &param);
+    printf("return value = %d\n", sched_setscheduler(0, 6, &param));
     printf("%s\n", strerror(errno));
     printf("My Policy After %d\n", sched_getscheduler(0));
 
