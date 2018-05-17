@@ -12,26 +12,39 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 		printk("init wrr_rq is NOT NULL\n");
 	}
 	INIT_LIST_HEAD(&(wrr_rq->run_list));
+
+	printk("[INIT_WRR_RQ] run_list = %x\n", &(wrr_rq->run_list));
+	printk("[INIT_WRR_RQ] run_list->next = %x\n", wrr_rq->run_list.next);
+	printk("[INIT_WRR_RQ] run_list->prev = %x\n", wrr_rq->run_list.prev);
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
     printk("enqueue_task_wrr visited\n");
 	if(p == NULL) printk("WHAT??? enqueue???\n");
 
-	if(!task_current(rq, p)) printk("enqueue_task_wrr: p is already running\n");
-	else printk("enqueue_task_wrr: p is not running\n");
 
-	if(!task_current(rq, p)) list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
-	
-//	inc_nr_running(rq);
+	printk("[ENQUEUE] run_list = %x\n", &(p->wrr.run_list));
+	printk("[ENQUEUE] run_list->next = %x\n", p->wrr.run_list.next);
+	printk("[ENQUEUE] run_list->prev = %x\n", p->wrr.run_list.prev);
+	INIT_LIST_HEAD(&(p->wrr.run_list));
+	if(list_empty(&(p->wrr.run_list))) {
+		printk("enqueue_task_wrr: enqueue_successful\n");
+		list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
+		inc_nr_running(rq);
+		p->on_rq = 1;
+	}
 }
 
 void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
 	printk("dequeue_task_wrr visited\n");
 	if(p == NULL) printk("WHAT??? dequeue???\n");
-	if(!task_current(rq, p)) list_del(&(p->wrr.run_list));	
-
-//	dec_nr_running(rq);
+	if(!list_empty(&(p->wrr.run_list))) {
+		printk("dequeue_task_wrr: dequeue_successful\n");
+		list_del(&(p->wrr.run_list));
+		INIT_LIST_HEAD(&(p->wrr.run_list));
+		dec_nr_running(rq);
+		//p->on_rq = 0;
+	}
 }
 
 void yield_task_wrr (struct rq *rq){
@@ -74,7 +87,7 @@ struct task_struct* pick_next_task_wrr (struct rq *rq){
 	printk("WRR_ENTITY NOT NULL in pick_next_task_wrr\n");
 	wrr_entity->time_slice = wrr_entity->weight * HZ / 100;
 	
-	list_del(&(wrr_entity->run_list));
+	//list_del(&(wrr_entity->run_list));
 	return wrr_task_of(wrr_entity);
 	// pick next task to run
 }
@@ -83,7 +96,7 @@ void put_prev_task_wrr (struct rq *rq, struct task_struct *p){
 	printk("put_prev_task_wrr visited\n");
 	printk("[WRR SCHEDULER] %x %x %x\n", &(p->wrr.run_list), p->wrr.run_list.next, p->wrr.run_list.prev);
 	
-	enqueue_task_wrr(rq, p, 0);
+	//enqueue_task_wrr(rq, p, 0);
 	// push task to end
 }
 
@@ -115,7 +128,7 @@ void update_curr_wrr(struct rq *rq) {
 void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 	struct sched_wrr_entity *wrr_se = &p->wrr;
 
-	printk("task_tick_wrr visited\n");
+//	printk("task_tick_wrr visited\n");
 
 	update_curr_wrr(rq);
 
@@ -140,8 +153,8 @@ void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 
 	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
 		printk("task_tick_wrr: requeue called\n");
-		//dequeue_task_wrr(rq, p, 0);
-		//enqueue_task_wrr(rq, p, 1);
+		dequeue_task_wrr(rq, p, 0);
+		enqueue_task_wrr(rq, p, 1);
 	    set_tsk_need_resched(p);
 
 		return;
@@ -181,29 +194,39 @@ void migrate_task_rq_wrr(struct task_struct *p, int next_cpu) {
 }
 
 void pre_schedule_wrr(struct rq *this_rq, struct task_struct *task) {
+	printk("pre_schedule_wrr visited\n");
 }
 void post_schedule_wrr(struct rq *this_rq) {
+	printk("post_schedule_wrr visited\n");
 }
 void task_waking_wrr(struct task_struct *task) {
+	printk("task_waking_wrr visited\n");
 }
 void task_woken_wrr(struct rq *this_rq, struct task_struct *task) {
+	printk("task_woken_wrr visited\n");
 }
 void set_cpus_allowed_wrr(struct task_struct *p, const struct cpumask *newmask) {
+	printk("set_cpus_allowed_wrr visited\n");
 }
 void rq_online_wrr(struct rq *rq) {
+	printk("rq_online_wrr visited\n");
 }
 void rq_offline_wrr(struct rq *rq) {
+	printk("rq_offline_wrr visited\n");
 }
 #endif
 void task_fork_wrr (struct task_struct *p) {
+	printk("task_fork_wrr visited\n");
 }
 
 void switched_from_wrr (struct rq *this_rq, struct task_struct *task) {
+	printk("switched_from_wrr visited\n");
 }
 
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
 void task_move_group_wrr (struct task_struct *p, int on_rq) {
+	printk("task_move_group_wrr visited\n");
 }
 #endif
 /*
