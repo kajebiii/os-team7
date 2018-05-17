@@ -28,7 +28,6 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-<<<<<<< Updated upstream
     printk("enqueue_task_wrr visited\n");
 	if(p == NULL) printk("WHAT??? enqueue???\n");
 
@@ -37,22 +36,17 @@ void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
 	printk("[ENQUEUE] run_list->next = %x\n", p->wrr.run_list.next);
 	printk("[ENQUEUE] run_list->prev = %x\n", p->wrr.run_list.prev);
 	printk("enqueue_task_wrr: enqueue_successful\n");
-=======
 	BUG_ON(!p);
     //printk("enqueue_task_wrr visited\n");
 	//if/(p == NULL) printk("WHAT??? enqueue???\n");
->>>>>>> Stashed changes
 	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 	inc_nr_running(rq);
 	//p->on_rq = 1;
 }
 
 void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-<<<<<<< Updated upstream
-=======
 	struct sched_wrr_entity *wrr = &p->wrr;
 
->>>>>>> Stashed changes
 	printk("dequeue_task_wrr visited\n");
 	if(p == NULL) printk("WHAT??? dequeue???\n");
 	if(!list_empty(&(p->wrr.run_list))) {
@@ -211,11 +205,8 @@ bool yield_to_task_wrr (struct rq *rq, struct task_struct *p, bool preempt){
 #ifdef CONFIG_SMP
 void migrate_task_rq_wrr(struct task_struct *p, int next_cpu) {
 	printk("migrate_task_rq_wrr visited\n");
-<<<<<<< Updated upstream
-=======
 	BUG_ON(task_cpu(p) != next_cpu);
 	//) printk("!!!!!!!!!!!!!!!!!!We Have to change!!!!!!!!!!!!!!!!!!!!! %d -> %d\n", task_cpu(p), next_cpu);
->>>>>>> Stashed changes
 }
 
 void pre_schedule_wrr(struct rq *this_rq, struct task_struct *task) {
