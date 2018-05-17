@@ -17,10 +17,8 @@ int main(){
     printf("%s\n", strerror(errno));
     printf("My Policy After %d\n", sched_getscheduler(0));
 
-	while(1) {
     for(i=1; i<200000000 ; i++){
         if(i%100000 == 0) printf("%d\n", i);
     }
-	}
     return 0;
 }

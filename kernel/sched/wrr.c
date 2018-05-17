@@ -3,6 +3,15 @@
 #include <linux/list.h>
 #include "sched.h"
 
+
+int list_has_entry(struct list_head *head, struct list_head *node) {
+	struct list_head *iter;
+	list_for_each(iter, head){
+		if(head == node) return 1;
+	}
+	return 0;
+}
+
 void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 	printk("init_wrr_rq visited\n");
 	if(wrr_rq == NULL) {
@@ -19,6 +28,7 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
+<<<<<<< Updated upstream
     printk("enqueue_task_wrr visited\n");
 	if(p == NULL) printk("WHAT??? enqueue???\n");
 
@@ -27,12 +37,22 @@ void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
 	printk("[ENQUEUE] run_list->next = %x\n", p->wrr.run_list.next);
 	printk("[ENQUEUE] run_list->prev = %x\n", p->wrr.run_list.prev);
 	printk("enqueue_task_wrr: enqueue_successful\n");
+=======
+	BUG_ON(!p);
+    //printk("enqueue_task_wrr visited\n");
+	//if/(p == NULL) printk("WHAT??? enqueue???\n");
+>>>>>>> Stashed changes
 	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 	inc_nr_running(rq);
 	//p->on_rq = 1;
 }
 
 void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
+<<<<<<< Updated upstream
+=======
+	struct sched_wrr_entity *wrr = &p->wrr;
+
+>>>>>>> Stashed changes
 	printk("dequeue_task_wrr visited\n");
 	if(p == NULL) printk("WHAT??? dequeue???\n");
 	if(!list_empty(&(p->wrr.run_list))) {
@@ -47,6 +67,7 @@ void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
 void yield_task_wrr (struct rq *rq){
 	printk("yield_task_wrr visited\n");
     // yield task
+	BUG_ON(!list_has_entry(&(rq->wrr.run_list), &(rq->curr->wrr.run_list)));
 	list_move_tail(&(rq->curr->wrr.run_list), &(rq->wrr.run_list));
 	//???
 	//list_move_tail(&(current->wrr.run_list), &(rq->wrr.run_list));
@@ -73,6 +94,8 @@ struct task_struct* pick_next_task_wrr (struct rq *rq){
 	struct wrr_rq *wrr_rq = &rq->wrr;
 	struct sched_wrr_entity *wrr_entity = list_first_entry_or_null(&(wrr_rq->run_list), struct sched_wrr_entity, run_list);
 	
+
+
 	//printk("pick_next_task_wrr visited\n");
 	if(wrr_entity == NULL) {
 		// This printk causes Kernel boot failure.
@@ -108,7 +131,7 @@ int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 
 	printk("select_task_rq_wrr visited\n");
 	cpu = task_cpu(p);
-
+	//BUG_ON(p->)
 	return cpu;
 }
 #endif
@@ -147,7 +170,7 @@ void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 	 * Requeue to the end of queue if we (and all of our ancestors) are the
 	 * only element on the queue
 	 */
-
+	BUG_ON(&(p->wrr.run_list) != rq->wrr.run_list.next);
 	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
 		printk("task_tick_wrr: requeue called\n");
 		dequeue_task_wrr(rq, p, 0);
@@ -188,6 +211,11 @@ bool yield_to_task_wrr (struct rq *rq, struct task_struct *p, bool preempt){
 #ifdef CONFIG_SMP
 void migrate_task_rq_wrr(struct task_struct *p, int next_cpu) {
 	printk("migrate_task_rq_wrr visited\n");
+<<<<<<< Updated upstream
+=======
+	BUG_ON(task_cpu(p) != next_cpu);
+	//) printk("!!!!!!!!!!!!!!!!!!We Have to change!!!!!!!!!!!!!!!!!!!!! %d -> %d\n", task_cpu(p), next_cpu);
+>>>>>>> Stashed changes
 }
 
 void pre_schedule_wrr(struct rq *this_rq, struct task_struct *task) {
@@ -260,7 +288,7 @@ const struct sched_class wrr_sched_class = {
     .enqueue_task = enqueue_task_wrr,
     .dequeue_task = dequeue_task_wrr,
     .yield_task = yield_task_wrr,
-    .yield_to_task = yield_to_task_wrr, //NULL,
+    //.yield_to_task = yield_to_task_wrr, //NULL,
 
 	.check_preempt_curr = check_preempt_curr,
 
@@ -268,23 +296,23 @@ const struct sched_class wrr_sched_class = {
 	.put_prev_task = put_prev_task_wrr,
 #ifdef CONFIG_SMP
 	.select_task_rq = select_task_rq_wrr,
-	.migrate_task_rq = migrate_task_rq_wrr, //NULL,
+	.migrate_task_rq = migrate_task_rq_wrr,
 
-	.pre_schedule = pre_schedule_wrr, //NULL,
-	.post_schedule = post_schedule_wrr, //NULL,
-	.task_waking = task_waking_wrr, //NULL,
-	.task_woken = task_woken_wrr, //NULL,
+	//.pre_schedule = pre_schedule_wrr, //NULL,
+	//.post_schedule = post_schedule_wrr, //NULL,
+	//.task_waking = task_waking_wrr, //NULL,
+	//.task_woken = task_woken_wrr, //NULL,
 
-	.set_cpus_allowed = set_cpus_allowed_wrr, //NULL,
+	//.set_cpus_allowed = set_cpus_allowed_wrr, //NULL,
 
-	.rq_online = rq_online_wrr, //NULL,
-	.rq_offline = rq_offline_wrr, //NULL,
+	//.rq_online = rq_online_wrr, //NULL,
+	//.rq_offline = rq_offline_wrr, //NULL,
 #endif
 	.set_curr_task = set_curr_task_wrr,
 	.task_tick = task_tick_wrr,
-	.task_fork = task_fork_wrr, //NULL,
+	//.task_fork = task_fork_wrr, //NULL,
 	
-	.switched_from = switched_from_wrr, //NULL,
+	//.switched_from = switched_from_wrr, //NULL,
 	.switched_to = switched_to_wrr,
 	.prio_changed = prio_changed_wrr,
 
