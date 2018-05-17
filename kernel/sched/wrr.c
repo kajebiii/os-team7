@@ -26,13 +26,10 @@ void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
 	printk("[ENQUEUE] run_list = %x\n", &(p->wrr.run_list));
 	printk("[ENQUEUE] run_list->next = %x\n", p->wrr.run_list.next);
 	printk("[ENQUEUE] run_list->prev = %x\n", p->wrr.run_list.prev);
-	INIT_LIST_HEAD(&(p->wrr.run_list));
-	if(list_empty(&(p->wrr.run_list))) {
-		printk("enqueue_task_wrr: enqueue_successful\n");
-		list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
-		inc_nr_running(rq);
-		p->on_rq = 1;
-	}
+	printk("enqueue_task_wrr: enqueue_successful\n");
+	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
+	inc_nr_running(rq);
+	//p->on_rq = 1;
 }
 
 void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){

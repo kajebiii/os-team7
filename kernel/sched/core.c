@@ -2981,6 +2981,8 @@ static void __sched __schedule(void)
 	struct rq *rq;
 	int cpu;
 
+	//printk("__schedule called\n");
+
 need_resched:
 	preempt_disable();
 	cpu = smp_processor_id();
@@ -7392,6 +7394,8 @@ void sched_move_task(struct task_struct *tsk)
 	int on_rq, running;
 	unsigned long flags;
 	struct rq *rq;
+
+	if(tsk->policy == 6) printk("sched_move_task called\n");
 
 	rq = task_rq_lock(tsk, &flags);
 
