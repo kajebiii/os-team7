@@ -1998,6 +1998,9 @@ context_switch(struct rq *rq, struct task_struct *prev,
 {
 	struct mm_struct *mm, *oldmm;
 
+	if(prev == NULL || next == NULL) {
+		printk("context_switch: prev = %x, next = %x\n", prev, next);
+	}
 	prepare_task_switch(rq, prev, next);
 
 	mm = next->mm;
@@ -5003,6 +5006,7 @@ static void migrate_tasks(unsigned int dead_cpu)
 	struct task_struct *next, *stop = rq->stop;
 	int dest_cpu;
 
+	printk("migrate_tasks called\n");
 	/*
 	 * Fudge the rq selection such that the below task selection loop
 	 * doesn't get stuck on the currently eligible stop task.
