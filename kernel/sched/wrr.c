@@ -99,8 +99,6 @@ unsigned int get_rr_interval_wrr (struct rq *rq, struct task_struct *task){
 	return wrr->time_slice;
 }
 
-	return false;
-}
 #ifdef CONFIG_SMP
 void migrate_task_rq_wrr(struct task_struct *p, int next_cpu) {
 }
