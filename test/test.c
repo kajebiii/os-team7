@@ -13,9 +13,13 @@ int main(){
     struct sched_param param;
     param.sched_priority = 50;
 
+	fork();
+	fork();
     printf("return value = %d\n", sched_setscheduler(0, 6, &param));
     printf("%s\n", strerror(errno));
     printf("My Policy After %d\n", sched_getscheduler(0));
+	fork();
+	fork();
 
     for(i=1; i<200000000 ; i++){
         if(i%100000 == 0) printf("%d\n", i);
