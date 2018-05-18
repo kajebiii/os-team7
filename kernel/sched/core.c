@@ -1999,6 +1999,9 @@ context_switch(struct rq *rq, struct task_struct *prev,
 {
 	struct mm_struct *mm, *oldmm;
 
+	if(prev == NULL || next == NULL) {
+		printk("context_switch: prev = %x, next = %x\n", prev, next);
+	}
 	prepare_task_switch(rq, prev, next);
 
 	mm = next->mm;
@@ -2978,6 +2981,8 @@ static void __sched __schedule(void)
 	unsigned long *switch_count;
 	struct rq *rq;
 	int cpu;
+
+	//printk("__schedule called\n");
 
 need_resched:
 	preempt_disable();
@@ -3993,6 +3998,8 @@ recheck:
 	/*
 	 * If not changing anything there's no need to proceed further:
 	 */
+	if(p->policy || policy) 
+		printk("Running successfully: policy = %d, p->policy = %d\n", policy, p->policy);
 	if (unlikely(policy == p->policy && (!rt_policy(policy) ||
 			param->sched_priority == p->rt_priority))) {
 		task_rq_unlock(rq, p, &flags);
@@ -4020,6 +4027,7 @@ recheck:
 		task_rq_unlock(rq, p, &flags);
 		goto recheck;
 	}
+	printk("Running succesfully\n");
 	on_rq = p->on_rq;
 	running = task_current(rq, p);
 	if (on_rq)
@@ -5003,6 +5011,7 @@ static void migrate_tasks(unsigned int dead_cpu)
 	struct task_struct *next, *stop = rq->stop;
 	int dest_cpu;
 
+	printk("migrate_tasks called\n");
 	/*
 	 * Fudge the rq selection such that the below task selection loop
 	 * doesn't get stuck on the currently eligible stop task.
@@ -7388,6 +7397,8 @@ void sched_move_task(struct task_struct *tsk)
 	int on_rq, running;
 	unsigned long flags;
 	struct rq *rq;
+
+	if(tsk->policy == 6) printk("sched_move_task called\n");
 
 	rq = task_rq_lock(tsk, &flags);
 

@@ -10,8 +10,6 @@ int main(){
     int n, i;
 
     printf("My Policy Before %d\n", sched_getscheduler(0));
-    fork();
-    fork();
 
     struct sched_param param;
     param.sched_priority = 50;
@@ -19,9 +17,6 @@ int main(){
     sched_setscheduler(0, 6, &param);
     printf("%s\n", strerror(errno));
     printf("My Policy After %d\n", sched_getscheduler(0));
-
-    fork();
-    fork();
 
     for(i=1; i<200000000 ; i++){
         if(i == 100000000) printf("%d\n", i);
