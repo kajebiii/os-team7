@@ -245,34 +245,6 @@ void task_move_group_wrr (struct task_struct *p, int on_rq) {
 	printk("task_move_group_wrr visited\n");
 }
 #endif
-/*
-
-	bool yield_to_task_wrr (struct rq *rq, struct task_struct *p, bool preempt){
-
-#ifdef CONFIG_SMP
-	void (*migrate_task_rq)(struct task_struct *p, int next_cpu);
-
-	void (*pre_schedule) (struct rq *this_rq, struct task_struct *task);
-	void (*post_schedule) (struct rq *this_rq);
-	void (*task_waking) (struct task_struct *task);
-	void (*task_woken) (struct rq *this_rq, struct task_struct *task);
-
-	void (*set_cpus_allowed)(struct task_struct *p,
-				 const struct cpumask *newmask);
-
-	void (*rq_online)(struct rq *rq);
-	void (*rq_offline)(struct rq *rq);
-#endif
-
-	void (*task_fork) (struct task_struct *p);
-
-	void (*switched_from) (struct rq *this_rq, struct task_struct *task);
-
-
-#ifdef CONFIG_FAIR_GROUP_SCHED
-	void (*task_move_group) (struct task_struct *p, int on_rq);
-#endif
-*/
 
 const struct sched_class wrr_sched_class = {
     .next = &fair_sched_class,
@@ -281,7 +253,7 @@ const struct sched_class wrr_sched_class = {
     .yield_task = yield_task_wrr,
     //.yield_to_task = yield_to_task_wrr, //NULL,
 
-	.check_preempt_curr = check_preempt_curr,
+	.check_preempt_curr = check_preempt_curr_wrr,
 
 	.pick_next_task = pick_next_task_wrr,
 	.put_prev_task = put_prev_task_wrr,
@@ -315,11 +287,11 @@ const struct sched_class wrr_sched_class = {
 };
 
 
-
-SYSCALL_DEFINE2(sched_setweight, pid_t, pid, int, weight){
+SYSCALL_DEFINE2(sched_setweight, pid_t, pid, int, weight)
+{
 	return 0;
 }
-
-SYSCALL_DEFINE1(sched_getweight, pid_t, pid){
+SYSCALL_DEFINE1(sched_getweight, pid_t, pid)
+{
 	return 0;
 }
