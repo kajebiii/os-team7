@@ -4,14 +4,6 @@
 #include "sched.h"
 
 
-int list_has_entry(struct list_head *head, struct list_head *node) {
-	struct list_head *iter;
-	list_for_each(iter, head){
-		if(head == node) return 1;
-	}
-	return 0;
-}
-
 void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 	INIT_LIST_HEAD(&(wrr_rq->run_list));
 }
