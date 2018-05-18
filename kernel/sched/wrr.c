@@ -13,73 +13,34 @@ int list_has_entry(struct list_head *head, struct list_head *node) {
 }
 
 void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
-	printk("init_wrr_rq visited\n");
-	if(wrr_rq == NULL) {
-		printk("init wrr_rq is NULL\n");
-	}
-	else {
-		printk("init wrr_rq is NOT NULL\n");
-	}
 	INIT_LIST_HEAD(&(wrr_rq->run_list));
-
-	printk("[INIT_WRR_RQ] run_list = %x\n", &(wrr_rq->run_list));
-	printk("[INIT_WRR_RQ] run_list->next = %x\n", wrr_rq->run_list.next);
-	printk("[INIT_WRR_RQ] run_list->prev = %x\n", wrr_rq->run_list.prev);
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-    printk("enqueue_task_wrr visited\n");
-	if(p == NULL) printk("WHAT??? enqueue???\n");
-
-
-	printk("[ENQUEUE] run_list = %x\n", &(p->wrr.run_list));
-	printk("[ENQUEUE] run_list->next = %x\n", p->wrr.run_list.next);
-	printk("[ENQUEUE] run_list->prev = %x\n", p->wrr.run_list.prev);
-	printk("enqueue_task_wrr: enqueue_successful\n");
-	BUG_ON(!p);
-    //printk("enqueue_task_wrr visited\n");
-	//if/(p == NULL) printk("WHAT??? enqueue???\n");
 	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 	inc_nr_running(rq);
-	//p->on_rq = 1;
 }
 
 void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
 	struct sched_wrr_entity *wrr = &p->wrr;
 
-	printk("dequeue_task_wrr visited\n");
-	if(p == NULL) printk("WHAT??? dequeue???\n");
 	if(!list_empty(&(p->wrr.run_list))) {
-		printk("dequeue_task_wrr: dequeue_successful\n");
 		list_del(&(p->wrr.run_list));
 		INIT_LIST_HEAD(&(p->wrr.run_list));
 		dec_nr_running(rq);
-		//p->on_rq = 0;
 	}
 }
 
 void yield_task_wrr (struct rq *rq){
-	printk("yield_task_wrr visited\n");
-    // yield task
-	BUG_ON(!list_has_entry(&(rq->wrr.run_list), &(rq->curr->wrr.run_list)));
 	list_move_tail(&(rq->curr->wrr.run_list), &(rq->wrr.run_list));
-	//???
-	//list_move_tail(&(current->wrr.run_list), &(rq->wrr.run_list));
 }
 
 void check_preempt_curr_wrr (struct rq *rq, struct task_struct *p, int flags){
-	printk("check_preempt_curr_wrr visited\n");
 	return; 
 }
 
 static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
 {
-	printk("wrr_task_of visited\n");
-	/*
-#ifdef CONFIG_SCHED_DEBUG
-	WARN_ON_ONCE(!rt_entity_is_task(rt_se));
-#endif
-	*/
 	return container_of(wrr_se, struct task_struct, wrr);
 }
 
@@ -87,105 +48,54 @@ int mytusvalue = 0;
 struct task_struct* pick_next_task_wrr (struct rq *rq){
 	struct wrr_rq *wrr_rq = &rq->wrr;
 	struct sched_wrr_entity *wrr_entity = list_first_entry_or_null(&(wrr_rq->run_list), struct sched_wrr_entity, run_list);
-	
-
-
-	//printk("pick_next_task_wrr visited\n");
-	if(wrr_entity == NULL) {
-		// This printk causes Kernel boot failure.
-		//if(mytusvalue >= 60000 && mytusvalue % 100 == 0) printk("WRR_ENTITY NULL in pick_next_task_wrr\n");
-
-		mytusvalue++;
-		return NULL;
-	}
-	printk("WRR_ENTITY NOT NULL in pick_next_task_wrr\n");
+	if(wrr_entity == NULL) return NULL;
 	wrr_entity->time_slice = wrr_entity->weight * HZ / 100;
-	
-	//list_del(&(wrr_entity->run_list));
 	return wrr_task_of(wrr_entity);
-	// pick next task to run
 }
 
 void put_prev_task_wrr (struct rq *rq, struct task_struct *p){
-	printk("put_prev_task_wrr visited\n");
-	printk("[WRR SCHEDULER] %x %x %x\n", &(p->wrr.run_list), p->wrr.run_list.next, p->wrr.run_list.prev);
-	
-	//enqueue_task_wrr(rq, p, 0);
-	// push task to end
 }
 
 #ifdef CONFIG_SMP
 int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 	// find cpu of task ??? passive load balance
 	// TODO: passive load balance. Look for rt.c
-
 	struct task_struct *curr;
 	struct rq *rq;
 	int cpu;
-
-	printk("select_task_rq_wrr visited\n");
 	cpu = task_cpu(p);
-	//BUG_ON(p->)
 	return cpu;
 }
 #endif
 
 void set_curr_task_wrr (struct rq *rq){
-	printk("set_curr_task_wrr visited\n");
-	// something changed
 }
 
 void update_curr_wrr(struct rq *rq) {
-	// TODO: How to update_curr_wrr?
-	//printk("update_curr_wrr visited\n");
 }
 void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 	struct sched_wrr_entity *wrr_se = &p->wrr;
-
-//	printk("task_tick_wrr visited\n");
-
 	update_curr_wrr(rq);
-
-	/*
-	 * WRR tasks need a special form of timeslice management.
-	 * FIFO tasks have no timeslices.
-	 */
 	if (p->policy != SCHED_WRR)
 		return;
 
 	if (--p->wrr.time_slice > 0)
 		return;
 
-	printk("Time slice became zero..\n");
 	p->wrr.time_slice = p->wrr.weight * HZ / 100;
-	printk("Next time slice = %d\n", p->wrr.time_slice);
-
-	/*
-	 * Requeue to the end of queue if we (and all of our ancestors) are the
-	 * only element on the queue
-	 */
-	BUG_ON(&(p->wrr.run_list) != rq->wrr.run_list.next);
 	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
-		printk("task_tick_wrr: requeue called\n");
 		dequeue_task_wrr(rq, p, 0);
 		enqueue_task_wrr(rq, p, 1);
 	    set_tsk_need_resched(p);
-
 		return;
 	}
 }
 
 void switched_to_wrr (struct rq *this_rq, struct task_struct *task){
-	printk("switched_to_wrr visited\n");
-	// task's rq changed to wrr
-	// Nothing to do here :)
 	return;
 }
 
 void prio_changed_wrr (struct rq *this_rq, struct task_struct *task, int oldprio){
-	printk("prio_change_wrr visited\n");
-	// task's prio changed
-	// Nothing to do here :)
 	return;
 }
 
@@ -193,56 +103,40 @@ unsigned int get_rr_interval_wrr (struct rq *rq, struct task_struct *task){
 	// round robin??
 	// TODO: What??
 	struct sched_wrr_entity *wrr = &task->wrr;
-
-	printk("get_rr_interval_wrr visited\n");
 	return wrr->time_slice;
 }
 
 bool yield_to_task_wrr (struct rq *rq, struct task_struct *p, bool preempt){
-	printk("yield_to_task_wrr visited\n");
 	return false;
 }
 #ifdef CONFIG_SMP
 void migrate_task_rq_wrr(struct task_struct *p, int next_cpu) {
-	printk("migrate_task_rq_wrr visited\n");
-	BUG_ON(task_cpu(p) != next_cpu);
-	//) printk("!!!!!!!!!!!!!!!!!!We Have to change!!!!!!!!!!!!!!!!!!!!! %d -> %d\n", task_cpu(p), next_cpu);
 }
 
 void pre_schedule_wrr(struct rq *this_rq, struct task_struct *task) {
-	printk("pre_schedule_wrr visited\n");
 }
 void post_schedule_wrr(struct rq *this_rq) {
-	printk("post_schedule_wrr visited\n");
 }
 void task_waking_wrr(struct task_struct *task) {
-	printk("task_waking_wrr visited\n");
 }
 void task_woken_wrr(struct rq *this_rq, struct task_struct *task) {
-	printk("task_woken_wrr visited\n");
 }
 void set_cpus_allowed_wrr(struct task_struct *p, const struct cpumask *newmask) {
-	printk("set_cpus_allowed_wrr visited\n");
 }
 void rq_online_wrr(struct rq *rq) {
-	printk("rq_online_wrr visited\n");
 }
 void rq_offline_wrr(struct rq *rq) {
-	printk("rq_offline_wrr visited\n");
 }
 #endif
 void task_fork_wrr (struct task_struct *p) {
-	printk("task_fork_wrr visited\n");
 }
 
 void switched_from_wrr (struct rq *this_rq, struct task_struct *task) {
-	printk("switched_from_wrr visited\n");
 }
 
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
 void task_move_group_wrr (struct task_struct *p, int on_rq) {
-	printk("task_move_group_wrr visited\n");
 }
 #endif
 
