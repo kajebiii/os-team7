@@ -56,6 +56,7 @@ int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 	struct rq *rq;
 	int cpu;
 	cpu = task_cpu(p);
+
 	return cpu;
 }
 #endif
@@ -98,38 +99,12 @@ unsigned int get_rr_interval_wrr (struct rq *rq, struct task_struct *task){
 	return wrr->time_slice;
 }
 
-bool yield_to_task_wrr (struct rq *rq, struct task_struct *p, bool preempt){
 	return false;
 }
 #ifdef CONFIG_SMP
 void migrate_task_rq_wrr(struct task_struct *p, int next_cpu) {
 }
 
-void pre_schedule_wrr(struct rq *this_rq, struct task_struct *task) {
-}
-void post_schedule_wrr(struct rq *this_rq) {
-}
-void task_waking_wrr(struct task_struct *task) {
-}
-void task_woken_wrr(struct rq *this_rq, struct task_struct *task) {
-}
-void set_cpus_allowed_wrr(struct task_struct *p, const struct cpumask *newmask) {
-}
-void rq_online_wrr(struct rq *rq) {
-}
-void rq_offline_wrr(struct rq *rq) {
-}
-#endif
-void task_fork_wrr (struct task_struct *p) {
-}
-
-void switched_from_wrr (struct rq *this_rq, struct task_struct *task) {
-}
-
-
-#ifdef CONFIG_FAIR_GROUP_SCHED
-void task_move_group_wrr (struct task_struct *p, int on_rq) {
-}
 #endif
 
 const struct sched_class wrr_sched_class = {
@@ -168,7 +143,7 @@ const struct sched_class wrr_sched_class = {
 	.get_rr_interval = get_rr_interval_wrr,
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
-	.task_move_group = task_move_group_wrr//NULL
+	//	.task_move_group = task_move_group_wrr//NULL
 #endif
 };
 
