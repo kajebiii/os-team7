@@ -359,6 +359,9 @@ struct rt_rq {
 };
 
 struct wrr_rq {
+	unsigned int wrr_weight_sum;
+	raw_spinlock_t wrr_runtime_lock;
+
 	struct list_head run_list;
 };
 
