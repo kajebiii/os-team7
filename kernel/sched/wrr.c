@@ -9,13 +9,13 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
+	p->wrr.wrr_rq = rq;
 	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 	inc_nr_running(rq);
 }
 
 void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-	struct sched_wrr_entity *wrr = &p->wrr;
-
+	p->wrr.wrr_rq = NULL;
 	if(!list_empty(&(p->wrr.run_list))) {
 		list_del(&(p->wrr.run_list));
 		INIT_LIST_HEAD(&(p->wrr.run_list));
