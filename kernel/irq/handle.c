@@ -133,9 +133,6 @@ static void irq_wake_thread(struct irq_desc *desc, struct irqaction *action)
 irqreturn_t
 handle_irq_event_percpu(struct irq_desc *desc, struct irqaction *action)
 {
-	//printk("handle_irq %x %x\n", desc, action);
-	BUG_ON(!desc);
-	BUG_ON(!action);
 	irqreturn_t retval = IRQ_NONE;
 	unsigned int flags = 0, irq = desc->irq_data.irq;
 
