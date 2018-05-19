@@ -2,14 +2,53 @@
 #include <linux/sched.h>
 #include <linux/list.h>
 #include "sched.h"
+#include <linux/interrupt.h>
 
+
+static void run_rebalance_domains_wrr(struct softirq_action *h) {
+	int this_cpu = smp_processor_id();
+	struct rq *this_rq = cpu_rq(this_cpu);
+	enum cpu_idle_type idle = this_rq->idle_balance ?
+						CPU_IDLE : CPU_NOT_IDLE;
+
+	//hmp_force_up_migration(this_cpu);
+
+	//rebalance_domains(this_cpu, idle);
+
+	/*
+	 * If this cpu has a pending nohz_balance_kick, then do the
+	 * balancing on behalf of the other idle cpus whose ticks are
+	 * stopped.
+	 */
+	//nohz_idle_balance(this_cpu, idle);
+}
+__init void init_sched_wrr_class(void)
+{
+#ifdef CONFIG_SMP
+	open_softirq(SCHED_SOFTIRQ_WRR, run_rebalance_domains_wrr);
+#endif
+}
+
+/* from fair.c */
+static inline int on_null_domain(int cpu)
+{
+	return !rcu_dereference_sched(cpu_rq(cpu)->sd);
+}
+void trigger_load_balance_wrr(struct rq *rq, int cpu)
+{
+	/* Don't need to rebalance while attached to NULL domain */
+	if (time_after_eq(jiffies, rq->wrr.next_balance) &&
+	    likely(!on_null_domain(cpu)))
+		raise_softirq(SCHED_SOFTIRQ_WRR);
+}
 
 void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 	INIT_LIST_HEAD(&(wrr_rq->run_list));
+	wrr_rq->next_balance = jiffies;
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-	p->wrr.wrr_rq = rq->wrr;
+	p->wrr.wrr_rq = &(rq->wrr);
 	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 	inc_nr_running(rq);
 }

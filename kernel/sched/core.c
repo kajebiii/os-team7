@@ -7137,6 +7137,7 @@ void __init sched_init(void)
 	idle_thread_set_boot_cpu();
 #endif
 	init_sched_fair_class();
+	init_sched_wrr_class();
 
 	scheduler_running = 1;
 }

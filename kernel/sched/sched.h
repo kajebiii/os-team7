@@ -363,6 +363,7 @@ struct wrr_rq {
 	raw_spinlock_t wrr_runtime_lock;
 
 	struct list_head run_list;
+	unsigned long next_balance;
 };
 
 #ifdef CONFIG_SMP
@@ -1072,6 +1073,7 @@ extern void update_max_interval(void);
 extern int update_runtime(struct notifier_block *nfb, unsigned long action, void *hcpu);
 extern void init_sched_rt_class(void);
 extern void init_sched_fair_class(void);
+extern void init_sched_wrr_class(void);
 
 extern void resched_task(struct task_struct *p);
 extern void resched_cpu(int cpu);
