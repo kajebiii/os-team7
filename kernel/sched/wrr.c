@@ -73,7 +73,8 @@ int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 
 void set_curr_task_wrr (struct rq *rq){
 //	struct task_struct *p = rq->curr;
-//	p->se.exec_start = rq->clock_task;}
+//	p->se.exec_start = rq->clock_task;
+}
 
 void update_curr_wrr(struct rq *rq) {
 }
