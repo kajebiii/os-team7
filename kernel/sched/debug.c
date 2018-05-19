@@ -143,6 +143,8 @@ print_task(struct seq_file *m, struct rq *rq, struct task_struct *p)
 #endif
 
 	SEQ_printf(m, "%15d", p->wrr.weight);
+	SEQ_printf(m, "%15d", p->wrr.time_slice);
+	SEQ_printf(m, "%15d", p->policy);
 
 	SEQ_printf(m, "\n");
 }
@@ -155,7 +157,7 @@ static void print_rq(struct seq_file *m, struct rq *rq, int rq_cpu)
 	SEQ_printf(m,
 	"\nrunnable tasks:\n"
 	"            task   PID         tree-key  switches  prio"
-	"     exec-runtime         sum-exec        sum-sleep        wrr_weight      wrr_timeslice\n"
+	"     exec-runtime         sum-exec        sum-sleep        wrr_weight      wrr_time_slice policy\n"
 	"------------------------------------------------------"
 	"-----------------------------------------------------------------------------------------\n");
 
