@@ -28,10 +28,7 @@ int main(int argc, char *argv[]){
 	pid_t pid = getpid();
 	int i;
 
-	fork();
-	fork();
-	fork();
-	fork();
+	//fork(); fork(); fork(); fork();
 
 	for(i = 1; i <= 20; i++){
 		struct timeval starttime, endtime;
@@ -42,7 +39,7 @@ int main(int argc, char *argv[]){
 		Factorization(BigPrime);
 		gettimeofday(&endtime, NULL);
 		
-		printf("weight : %d / time : %f s\n", i, (endtime.tv_usec - starttime.tv_usec) * 0.000001);
+		printf("weight : %d / time : %f s\n", i, (endtime.tv_sec - starttime.tv_sec) + (endtime.tv_usec - starttime.tv_usec) * 0.000001);
 	}
 
 }
