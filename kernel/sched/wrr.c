@@ -51,12 +51,22 @@ void put_prev_task_wrr (struct rq *rq, struct task_struct *p){
 #ifdef CONFIG_SMP
 int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 	// find cpu of task ??? passive load balance
-	// TODO: passive load balance. Look for rt.c
-	struct task_struct *curr;
-	struct rq *rq;
-	int cpu;
-	cpu = task_cpu(p);
+	// TODO: passive load balance. Look for rt.c (Done?)
 
+	struct task_struct *curr;
+	struct rq *rq, *rq2;
+	int cpu, cpu2;
+
+	cpu = task_cpu(p);
+	
+	//if(current_task(rq, p)) return cpu;
+	rcu_read_lock();
+	for_each_online_cpu(cpu2) {
+		rq = cpu_rq(cpu);
+		rq2 = cpu_rq(cpu2);
+		if(rq->wrr.wrr_weight_sum > rq2->wrr.wrr_weight_sum) cpu = cpu2;
+	}
+	rcu_read_unlock();
 	return cpu;
 }
 #endif
@@ -85,22 +95,24 @@ void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 }
 
 void switched_to_wrr (struct rq *this_rq, struct task_struct *task){
+	// Nothing to do here
 	return;
 }
 
 void prio_changed_wrr (struct rq *this_rq, struct task_struct *task, int oldprio){
+	// Nothing to do here
 	return;
 }
 
 unsigned int get_rr_interval_wrr (struct rq *rq, struct task_struct *task){
 	// round robin??
-	// TODO: What??
 	struct sched_wrr_entity *wrr = &task->wrr;
 	return wrr->time_slice;
 }
 
 #ifdef CONFIG_SMP
 void migrate_task_rq_wrr(struct task_struct *p, int next_cpu) {
+	// (maybe) Nothing to do here
 }
 
 #endif
@@ -148,6 +160,8 @@ const struct sched_class wrr_sched_class = {
 
 SYSCALL_DEFINE2(sched_setweight, pid_t, pid, int, weight)
 {
+	
+
 	return 0;
 }
 SYSCALL_DEFINE1(sched_getweight, pid_t, pid)
