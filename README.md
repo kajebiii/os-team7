@@ -126,7 +126,7 @@ You will need to open two or many terminal.
 	- Decrease wrr_entity's time_slice
 	- if time_slice is zero, dequeue and enqueue the task
 
-* get_rr_interval_Wrr
+* get_rr_interval_wrr
 	- return wrr_entity's time_slice
 
 ## kernel/sched/wrr.c (About two system call)
