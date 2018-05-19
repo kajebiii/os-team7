@@ -113,12 +113,7 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-<<<<<<< HEAD
-	printk("enqueue_task_wrr\n");
-	p->wrr.wrr_rq = &(rq->wrr);
-=======
 	rq->wrr.wrr_weight_sum += p->wrr.weight;
->>>>>>> proj3_syscall
 	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 	inc_nr_running(rq);
 }
