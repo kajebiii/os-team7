@@ -1,10 +1,10 @@
 # OS Team 7 Project 3 README
 
 ## How to build kernel
-The way to build kernel doesn't differ from original kernel. Type `./build` in the root folder, and kernel will be builded. Or you can type `make build` in the "test" folder.
+The way to build kernel does not differ from original kernel. Type `./build` in the root folder, and kernel will be built. Or you can type `make build` in the "test" folder.
 
 ## Flashing the Device
-The way to flash the device doesn't differ from original.
+The way to flash the device is the same as original.
 
 After the building is done.
 
@@ -87,7 +87,7 @@ You will need to open two or many terminal.
 
 * Data structure
 	- wrr_rq
-		* struct list_head `run_list` : Head of the linked list
+		* struct list_head `run_list` : head of the linked list
 		* TODO
 	- sched_wrr_entity
 		* int `weight` : weight of sched_wrr_entity
@@ -98,7 +98,7 @@ You will need to open two or many terminal.
 ### wrr_sched_class functions
 
 * init_wrr_rq
-	- Initialize the run_list in wrr_rq
+	- Initialize run_list in wrr_rq
 
 * enqueue_task_wrr
 	- Set wrr_entity's wrr_rq to `rq->wrr`
@@ -115,7 +115,7 @@ You will need to open two or many terminal.
 	- Move rq's current running wrr_entity to tail of wrr_rq's linked list
 
 * pick_next_task_wrr
-	- Pick first entry or linked list (if `NULL`, return `NULL`)
+	- Pick first entry of the linked list. (if the list is empty, return `NULL`)
 	- return task_struct of the wrr_entity
 
 * select_task_rq_wrr
