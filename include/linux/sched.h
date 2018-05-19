@@ -1058,8 +1058,6 @@ struct sched_wrr_entity {
 	int weight;
 	struct list_head run_list;
     int time_slice;
-
-	struct wrr_rq		*wrr_rq;
 };
 
 struct rcu_node;
