@@ -4,17 +4,82 @@
 #include "sched.h"
 #include <linux/interrupt.h>
 
+static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
+{
+	return container_of(wrr_se, struct task_struct, wrr);
+}
 
 static void run_rebalance_domains_wrr(struct softirq_action *h) {
 	int this_cpu = smp_processor_id();
-	struct rq *this_rq = cpu_rq(this_cpu);
-	enum cpu_idle_type idle = this_rq->idle_balance ?
-						CPU_IDLE : CPU_NOT_IDLE;
 
+	int min_cpu = this_cpu, max_cpu = this_cpu, cpu;
+	struct rq *min_rq = cpu_rq(min_cpu), *max_rq = cpu_rq(max_cpu);
+	struct sched_wrr_entity *move_entity;
+	struct task_struct *move_task, *max_move_task = NULL;
+
+	unsigned int min_weight_sum, max_weight_sum;
+	unsigned int entity_max_weight;
+
+	//if(current_task(rq, p)) return cpu;
+	rcu_read_lock();
+	for_each_online_cpu(cpu) {
+		struct rq *rq = cpu_rq(cpu);
+		if(min_rq->wrr.wrr_weight_sum > rq->wrr.wrr_weight_sum) {
+			min_cpu = cpu;
+			min_rq = rq;
+		}
+		if(max_rq->wrr.wrr_weight_sum < rq->wrr.wrr_weight_sum) {
+			max_cpu = cpu;
+			max_rq = rq;
+		}
+	}
+	rcu_read_unlock();
+
+	if(min_rq == max_rq) return;
+
+	local_irq_disable();
+	double_rq_lock(min_rq, max_rq);
+
+	min_weight_sum = min_rq->wrr.wrr_weight_sum;
+	max_weight_sum = max_rq->wrr.wrr_weight_sum;
+	entity_max_weight = (max_weight_sum - min_weight_sum) / 2;
+
+	if(min_weight_sum >= max_weight_sum) {
+		double_rq_unlock(min_rq, max_rq);
+		local_irq_enable();
+		return;
+	}
+	
+	list_for_each_entry(move_entity, &(max_rq->wrr.run_list), run_list) {
+		move_task = wrr_task_of(move_entity);
+		if(move_entity->weight <= entity_max_weight) {
+			if(max_rq->curr != move_task) {
+				if(cpumask_test_cpu(min_cpu, tsk_cpus_allowed(move_task))) {
+					if(max_move_task != NULL || max_move_task->wrr.weight < move_task->wrr.weight) {
+						max_move_task = move_task;
+					}
+				}
+			}
+		}
+	}
+
+	if(max_move_task == NULL) {
+		double_rq_unlock(min_rq, max_rq);
+		local_irq_enable();
+		return;
+	}
+	
+	deactivate_task(max_rq, max_move_task, 0);
+	set_task_cpu(max_move_task, min_cpu);
+	activate_task(min_rq, max_move_task, 0);
+	check_preempt_curr(min_rq, max_move_task, 0);
+
+	double_rq_unlock(min_rq, max_rq);
+	local_irq_enable();
+	
+	//enum cpu_idle_type idle = this_rq->idle_balance ? CPU_IDLE : CPU_NOT_IDLE;
 	//hmp_force_up_migration(this_cpu);
-
 	//rebalance_domains(this_cpu, idle);
-
 	/*
 	 * If this cpu has a pending nohz_balance_kick, then do the
 	 * balancing on behalf of the other idle cpus whose ticks are
@@ -48,6 +113,7 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
+	printk("enqueue_task_wrr\n");
 	p->wrr.wrr_rq = &(rq->wrr);
 	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 	inc_nr_running(rq);
@@ -70,10 +136,6 @@ void check_preempt_curr_wrr (struct rq *rq, struct task_struct *p, int flags){
 	return; 
 }
 
-static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
-{
-	return container_of(wrr_se, struct task_struct, wrr);
-}
 
 int mytusvalue = 0;
 struct task_struct* pick_next_task_wrr (struct rq *rq){
@@ -92,7 +154,6 @@ int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 	// find cpu of task ??? passive load balance
 	// TODO: passive load balance. Look for rt.c (Done?)
 
-	struct task_struct *curr;
 	struct rq *rq, *rq2;
 	int cpu, cpu2;
 
@@ -103,7 +164,11 @@ int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 	for_each_online_cpu(cpu2) {
 		rq = cpu_rq(cpu);
 		rq2 = cpu_rq(cpu2);
-		if(rq->wrr.wrr_weight_sum > rq2->wrr.wrr_weight_sum) cpu = cpu2;
+		if(rq->wrr.wrr_weight_sum > rq2->wrr.wrr_weight_sum) {
+			if(cpumask_test_cpu(cpu2, tsk_cpus_allowed(p))) {
+				cpu = cpu2;
+			}
+		}
 	}
 	rcu_read_unlock();
 	return cpu;
