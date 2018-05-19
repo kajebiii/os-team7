@@ -9,7 +9,7 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-	p->wrr.wrr_rq = rq;
+	p->wrr.wrr_rq = rq->wrr;
 	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 	inc_nr_running(rq);
 }
@@ -72,7 +72,8 @@ int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 #endif
 
 void set_curr_task_wrr (struct rq *rq){
-}
+//	struct task_struct *p = rq->curr;
+//	p->se.exec_start = rq->clock_task;}
 
 void update_curr_wrr(struct rq *rq) {
 }
@@ -160,8 +161,6 @@ const struct sched_class wrr_sched_class = {
 
 SYSCALL_DEFINE2(sched_setweight, pid_t, pid, int, weight)
 {
-	
-
 	return 0;
 }
 SYSCALL_DEFINE1(sched_getweight, pid_t, pid)
