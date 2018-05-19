@@ -9,14 +9,14 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-	p->wrr.wrr_rq = rq->wrr;
+	rq->wrr.wrr_weight_sum += p->wrr.weight;
 	list_add_tail(&(p->wrr.run_list), &(rq->wrr.run_list));
 	inc_nr_running(rq);
 }
 
 void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
-	p->wrr.wrr_rq = NULL;
 	if(!list_empty(&(p->wrr.run_list))) {
+		rq->wrr.wrr_weight_sum -= p->wrr.weight;
 		list_del(&(p->wrr.run_list));
 		INIT_LIST_HEAD(&(p->wrr.run_list));
 		dec_nr_running(rq);
@@ -159,12 +159,85 @@ const struct sched_class wrr_sched_class = {
 #endif
 };
 
+/*
+ * task_rq_lock - lock p->pi_lock and lock the rq @p resides on.
+ */
+static struct rq *task_rq_lock(struct task_struct *p, unsigned long *flags)
+	__acquires(p->pi_lock)
+	__acquires(rq->lock)
+{
+	struct rq *rq;
+
+	for (;;) {
+		raw_spin_lock_irqsave(&p->pi_lock, *flags);
+		rq = task_rq(p);
+		raw_spin_lock(&rq->lock);
+		if (likely(rq == task_rq(p)))
+			return rq;
+		raw_spin_unlock(&rq->lock);
+		raw_spin_unlock_irqrestore(&p->pi_lock, *flags);
+	}
+}
+
+static inline void
+task_rq_unlock(struct rq *rq, struct task_struct *p, unsigned long *flags)
+	__releases(rq->lock)
+	__releases(p->pi_lock)
+{
+	raw_spin_unlock(&rq->lock);
+	raw_spin_unlock_irqrestore(&p->pi_lock, *flags);
+}
 
 SYSCALL_DEFINE2(sched_setweight, pid_t, pid, int, weight)
 {
-	return 0;
+	struct task_struct *tsk = NULL;
+	int ret = -EINVAL, old_weight;
+	unsigned long flags;
+	struct rq *rq;
+
+	if(pid < 0) return -EINVAL;
+	if(weight <= 0 || weight > 20) return -EINVAL;
+
+	rcu_read_lock();
+	tsk = pid ? find_task_by_vpid(pid) : current;
+	if(tsk == NULL){
+		rcu_read_unlock();
+		return -EINVAL;
+	}
+
+	rq = task_rq_lock(tsk, &flags);
+	if(tsk->policy != SCHED_WRR) goto end;
+	
+	// check permission
+	
+	old_weight = tsk->wrr.weight;
+	tsk->wrr.weight = weight;
+
+	rq->wrr.wrr_weight_sum += weight - old_weight; // update weight sum
+
+	if(rq->curr != tsk) { 		// update timeslice
+		tsk->wrr.time_slice = weight * HZ / 100;
+	}
+	ret = 0;
+
+end:
+	task_rq_unlock(rq, tsk, &flags);
+	rcu_read_unlock();
+	return ret;
 }
+
 SYSCALL_DEFINE1(sched_getweight, pid_t, pid)
 {
-	return 0;
+	struct task_struct *tsk = NULL;
+	int ret = -EINVAL;
+	if(pid < 0) return -EINVAL;
+
+	rcu_read_lock();
+	tsk = pid ? find_task_by_vpid(pid) : current;
+	if(tsk == NULL) goto end;
+	if(tsk->policy != SCHED_WRR) goto end;
+	ret = tsk->wrr.weight;	
+end:
+	rcu_read_unlock();
+	return ret;
 }

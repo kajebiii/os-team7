@@ -185,7 +185,6 @@ extern struct task_group root_task_group;
 		.run_list	= LIST_HEAD_INIT(tsk.wrr.run_list),	\
 		.time_slice = 100,			\
 		.weight = 10,			\
-		.wrr_rq = NULL,				\
 	},								\
 	.tasks		= LIST_HEAD_INIT(tsk.tasks),			\
 	INIT_PUSHABLE_TASKS(tsk)					\
