@@ -25,6 +25,13 @@ void Factorization(int n, int print){
 }
 
 int main(int argc, char *argv[]){
+	int ITER = 50;
+	if(argc != 2) {
+		printf("Usage ./trial [ITER]");
+		return 0;
+	}
+	ITER = atoi(argv[1]);
+	if(ITER <= 0) ITER = 1;
 
 	const int BigPrime = 5000011;
 	pid_t pid = getpid();
@@ -32,10 +39,11 @@ int main(int argc, char *argv[]){
 
 	//fork(); fork(); fork(); fork();
 	int p;
-	int ITER = 50;
 
 	FILE *out = fopen("output.txt", "w");
-	printf("Weight\tTime(s)\n");
+	printf("ITER : %d\n", ITER);
+	printf("ITER : %d\n", ITER);
+	fprintf(out, "ITER : %d\n", ITER);
 	fprintf(out, "Weight\tTime(s)\n");
 	for(i = 1; i <= 20; i++){
 		double totalTime = 0;
