@@ -31,11 +31,8 @@ After logging in, you have to execute
 ```bash
 BOARD$ direct_set_debug.sh --sdb-set
 ```
-to enable sdb. And if you execute
-```bash
-BOARD$ cat /proc/kmsg | grep "wrr"
-```
-above command, you can see our logs in wrr.c
+to enable sdb. 
+
 
 In the "test" folder, type 
 ```bash
@@ -45,16 +42,37 @@ HOST$ make run
 ```
 Then, It will compile test codes and transfer our test excutable files between the device and your PC.
 
+And if you execute
 ```bash
-HOST$ sdb shell
-HOST$ (sdb) > /root/selector [STARTING INTEGER]
+BOARD$ chmod 777 manyWhiles
+BOARD$ ./manyWhiles
 ```
-Above command will execute `selector`. 
+above command, it will execute 16 ./while in background;
+
+And if you want to execute our trial program
 ```bash
-HOST$ sdb shell
-HOST$ (sdb) > /root/trial [INTERGER IDENTIFIER]
+BOARD$ ./trial [ITER]
 ```
-Above command will execute `trial`.
+ITER is iteration number of naive Trial Division.
+Trial program will calculate average wall-clock time by weights (1 to 20). And result will export to "output.txt" in "root/".
+
+In ther "test/shellScript" folder, type
+```bash
+HOST$ ./proc_kmsg.sh
+```
+will show printk messages. We printed "load balance visited" and "task move info" using prink function.
+
+Type
+```bash
+HOST$ ./sched_debug.sh
+```
+will show scheduler debug information. We printed wrr_weight_sum per wrr_rq. And each task's wrr_weight, wrr_timeslice, and policy.
+
+If you want to see only our trial program task's infomation, type
+```bash
+HOST$ ./find_trial.sh
+```
+adove command. 
 
 You will need to open two or many terminal.
 
