@@ -334,7 +334,7 @@ do {									\
 	print_cfs_stats(m, cpu);
 	print_rt_stats(m, cpu);
 
-	SEQ_printf(m, "wrr_rq addr: %x\n", cpu_rq(cpu)->wrr);
+	SEQ_printf(m, "wrr_weight_sum %u\n", cpu_rq(cpu)->wrr.wrr_weight_sum);
 
 	rcu_read_lock();
 	print_rq(m, rq, cpu);

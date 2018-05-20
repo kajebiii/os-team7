@@ -13,6 +13,7 @@ static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
 }
 
 static void run_rebalance_domains_wrr(struct softirq_action *h) {
+	//printk("Load balance Visited\n");
 	int this_cpu = smp_processor_id();
 
 	int min_cpu = this_cpu, max_cpu = this_cpu, cpu;
@@ -73,7 +74,7 @@ static void run_rebalance_domains_wrr(struct softirq_action *h) {
 		local_irq_enable();
 		return;
 	}
-	
+	//printk("pid %d move : cpu%d to cpu%d\n", max_move_task->pid, max_cpu, min_cpu);
 	deactivate_task(max_rq, max_move_task, 0);
 	set_task_cpu(max_move_task, min_cpu);
 	activate_task(min_rq, max_move_task, 0);
@@ -120,6 +121,7 @@ void trigger_load_balance_wrr(struct rq *rq, int cpu)
 void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 	INIT_LIST_HEAD(&(wrr_rq->run_list));
 	wrr_next_balance = jiffies;
+	wrr_rq->wrr_weight_sum = 0;
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
