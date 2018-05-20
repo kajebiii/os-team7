@@ -201,6 +201,12 @@ You will need to open two or many terminal.
 		* This code does nothing and holds CPU.
 	- We executed while.c 32 times and executed trial.c, to test load balance.
 
+## Result of Test
+
+We executed infinite-looping programs 32 times first and executed trial to test our load balancing. The first plot is an execution time – weight graph. We tested 100 times and the graph shows its average execution time for each weight. It shows that our load balancing works well. The speed is in proportion to weight/(weight+B) for some constant B, which means not-test task's load of runqueue. Therefore, the execution time is proportional to (weight+B)/weight. Let f(w) be the execution time when weight is equal to w. Then k(w+B)/w for some constant k means performance of core. We can see that wf(w)=kw+kB. So wf(w) should be a linear function. The 4th plot implies this hypothesis is correct in our load balancing method. 
+But 1st, 2nd plot, test with enable auto-balancing, It has some error. Two reason for that. First is, artik's exynos cpu has 4 little core and 4 big core, their performance is different. It makes different time result. Second one is problem of weight-sum. some kernel process do little work, so yield before end of it's time slice. It makes load-unbalance with cores.
+
+
 ## Any lessons learned
 * We learned the structure of Linux scheduler, and how to add new scheduler in it. We had to add new entity and rq for, and implement necessary functions and structs to implement it.
 * We learned how to debug in kernel code, using printk and some other ways. We experienced lots of kernel panic this time, and could debug those using our methods.
