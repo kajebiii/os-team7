@@ -83,7 +83,7 @@ You will need to open two or many terminal.
 	- For debug our scheduler
 		* [arch/arm/configs/artik10_defconfig](https://github.com/swsnu/os-team7/blob/proj3/)
 
-## kernel/sched/wrr.c (About wrr_sched_class)
+### kernel/sched/wrr.c (About wrr_sched_class)
 
 * Data structure
 	- wrr_rq
@@ -96,7 +96,7 @@ You will need to open two or many terminal.
 		* int `time_slice` : time_slice of sched_wrr_entity
 		* struct list_head `run_list` : Linked list in rq
 
-### wrr_sched_class functions
+## wrr_sched_class functions
 
 * init_wrr_rq
 	- Initialize run_list in wrr_rq
@@ -129,6 +129,26 @@ You will need to open two or many terminal.
 
 * get_rr_interval_wrr
 	- return wrr_entity's time_slice
+
+## load balancing functions
+
+* run_rebalance_domains_wrr
+	- Calculate min_cpu and max_cpu, which has minimum/maximum weight sum
+	- Among tasks in max_cpu, find tasks that can be moved to min_cpu that satisfies following conditions:
+		* Can be migrated to min_rq
+		* After moved, min_rq weight sum < max_rq weight_sum
+		* Tasks are not currently running
+		* Among those tasks, choose task with biggest weight
+	- If there is task with above condition, move that task from min_rq to max_rq
+
+* init_sched_wrr_class
+	- Registers handler for SCHED_SOFTIRQ_WRR signal to call run_rebalance_domains_wrr
+
+* trigger_load_balance_wrr
+	- Locks wrr_balancing, to prevent lots of cpus call load balance at once.
+	- If enough time passed from previous load balance, raise SCHED_SOFTIRQ_WRR signal to run load_balance function.
+	- Unlocks wrr_balancing.
+
 
 ## kernel/sched/wrr.c (About two system call)
 * sched_setweight(pid_t pid, int weight)
