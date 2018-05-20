@@ -132,11 +132,14 @@ You will need to open two or many terminal.
 ## kernel/sched/wrr.c (About two system call)
 * sched_setweight(pid_t pid, int weight)
 	- Used SYSCALL_DEFINE2 macro
-	- TODO
+	- Set weight of the task with input pid.
+	- Get pid number and weight as an input.
+	- If function gets valid pid and weight, returns weight of task specified by pid. Else (pid < 0, there is no task with that pid, weight range is invalid or user has no permission to change weight), returns -EINVAL.
+
 * sched_getweight(pid_t pid)
 	- Used SYSCALL_DEFINE1 macro
-	- TODO
-
+	- Get pid number as an input.
+	- If function gets valid pid, returns weight of task specified by pid. Else (pid < 0 or there is no task with that pid), returns -EINVAL.
 ## test/trial.c
 * What test code does:
 	- TODO
