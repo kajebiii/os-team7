@@ -13,9 +13,11 @@ This idea can be implemented using following method:
 
 ## 2. While load balancing, give high priority between cache-sharing CPUs.
 
+Recently CPUs have multiple cache hierachy. In this case, near-core share more caches. So, to prevent many cache misses of task migration in load balancing, give high priority to migrate between cache-share core.
 
 ## 3. Considering core speed
 
+In case of ARM big.LITTLE CPU or multiple CPU with different speeds, each core has different performance. So normalize weight_sum to weight_sum/core_speed and do load balance. It can makes each task get fair amount of operation instead just time.
 
 ## 4. Using waiting time of each task
 
