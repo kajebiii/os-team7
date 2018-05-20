@@ -88,7 +88,9 @@ You will need to open two or many terminal.
 * Data structure
 	- wrr_rq
 		* struct list_head `run_list` : head of the linked list
-		* TODO
+		* unsigned int wrr_weight_sum : sum of weights of tasks in rq
+		* unsigned long next_balance : time that we should execute next load balance
+
 	- sched_wrr_entity
 		* int `weight` : weight of sched_wrr_entity
 		* int `time_slice` : time_slice of sched_wrr_entity
@@ -139,9 +141,17 @@ You will need to open two or many terminal.
 	- Used SYSCALL_DEFINE1 macro
 	- Get pid number as an input.
 	- If function gets valid pid, returns weight of task specified by pid. Else (pid < 0 or there is no task with that pid), returns -EINVAL.
-## test/trial.c
+## test/trial.c, test/while.c
 * What test code does:
-	- TODO
+	- test/trial.c
+		* For each weight from 1~20, calculate (real) time elapsed to factorize big prime(5e6+11 = 5000011).
+		* Repeats ITER times (which can be given as input), and prints average value.
+	- test/while.c
+		* Set random weights, and executes while loop.
+		* This code does nothing and holds CPU.
+	- We executed while.c 32 times and executed trial.c, to test load balance.
 
 ## Any lessons learned
-* TODO
+* We learned the structure of Linux scheduler, and how to add new scheduler in it. We had to add new entity and rq for, and implement necessary functions and structs to implement it.
+* We learned how to debug in kernel code, using printk and some other ways. We experienced lots of kernel panic this time, and could debug those using our methods.
+* We learned about mechanism of load balancing in Linux kernel, and how to implement our own load balancing mechanisms. We learned how to use jiffies to check time to load balance, and only one cpu can do it.
