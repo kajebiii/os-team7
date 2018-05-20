@@ -159,6 +159,7 @@ void put_prev_task_wrr (struct rq *rq, struct task_struct *p){
 
 #ifdef CONFIG_SMP
 int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
+	//%f\n", wrr_next_balance * 1. / HZ);
 	struct rq *rq, *rq2;
 	int cpu, cpu2;
 
