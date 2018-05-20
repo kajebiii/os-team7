@@ -12,6 +12,8 @@
 
 
 int main(int argc, char *argv[]) {
+	srand(time(NULL));
+	syscall(SYSCALL_SCHED_SETWEIGHT, 0, rand() % 20 + 1);
 	while(1);
 	return 0;
 }

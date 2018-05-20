@@ -20,7 +20,7 @@ lthor:
 	cd .. && lthor image.tar
 
 run:
-	sdb root on && sdb push test /root/test && sdb push trial /root/trial && sdb push while /root/while && sdb push normalWhile /root/normalWhile
+	sdb root on && sdb push test /root/test && sdb push trial /root/trial && sdb push while /root/while && sdb push normalWhile /root/normalWhile && sdb push shellScript/manyWhile.sh /root/manyWhile.sh
 
 #sdb root on && sdb push selector /root/selector && sdb push trial /root/trial && sdb push rotd /root/rotd && sdb push unlockFirst /root/unlockFirst && sdb push random /root/random
 

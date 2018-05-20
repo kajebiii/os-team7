@@ -32,7 +32,11 @@ int main(int argc, char *argv[]){
 
 	//fork(); fork(); fork(); fork();
 	int p;
-	int ITER = 20;
+	int ITER = 50;
+
+	FILE *out = fopen("output.txt", "w");
+	printf("Weight\tTime(s)\n");
+	fprintf(out, "Weight\tTime(s)\n");
 	for(i = 1; i <= 20; i++){
 		double totalTime = 0;
 		syscall(SYSCALL_SCHED_SETWEIGHT, pid, i);
@@ -46,7 +50,8 @@ int main(int argc, char *argv[]){
 			//printf("weight : %d / time : %f s\n", i, (endtime.tv_sec - starttime.tv_sec) + (endtime.tv_usec - starttime.tv_usec) * 0.000001);
 			totalTime += (endtime.tv_sec - starttime.tv_sec) + (endtime.tv_usec - starttime.tv_usec) * 0.000001;
 		}
-		printf("weight : %d / time : %f s\n", i, totalTime / ITER);
+		printf("%d\t%f s\n", i, totalTime / ITER);
+		fprintf(out, "%d\t%f s\n", i, totalTime / ITER);
 	}
 	return 0;
 }
