@@ -33,7 +33,8 @@ int main(int argc, char *argv[]){
 	ITER = atoi(argv[1]);
 	if(ITER <= 0) ITER = 1;
 
-	const int BigPrime = 5000011;
+	//const int BigPrime = 50000017;
+	const int BigPrime = 50000017;
 	pid_t pid = getpid();
 	int i;
 
@@ -42,12 +43,13 @@ int main(int argc, char *argv[]){
 
 	FILE *out = fopen("output.txt", "w");
 	printf("ITER : %d\n", ITER);
-	printf("ITER : %d\n", ITER);
+	printf("Weight\tTime(s)\n");
 	fprintf(out, "ITER : %d\n", ITER);
 	fprintf(out, "Weight\tTime(s)\n");
 	for(i = 1; i <= 20; i++){
 		double totalTime = 0;
 		syscall(SYSCALL_SCHED_SETWEIGHT, pid, i);
+		sleep(13);
 		for(p=1; p<=ITER; p++) {
 			struct timeval starttime, endtime;
 
