@@ -161,6 +161,18 @@ You will need to open two or many terminal.
 	- Used SYSCALL_DEFINE1 macro
 	- Get pid number as an input.
 	- If function gets valid pid, returns weight of task specified by pid. Else (pid < 0 or there is no task with that pid), returns -EINVAL.
+	
+## concurrency control
+ * Lock related with scheduler
+ 	- task_struct.pi_lock : Lock of task_struct
+ 	- rq.lock : Lock of runqueue
+	- rcu_read_lock : Accquire when access cpu-related information. Almost every where.
+ * Assume that every callback in sched_class will call with accquired rq's lock and rcu_read_lock
+ * In setweight system call, we should get rq lock of given task
+ 	- core.c's task_rq_lock : accquire given task_struct's pi_lock and corresponds runqueue's lock and return runqueue
+ * In load_balance, when move task, we should get source and destination run queue's lock. 
+ 	- Use core.c's double_rq_lock to get both lock with prevent deadlock
+	
 ## test/trial.c, test/while.c
 * What test code does:
 	- test/trial.c
