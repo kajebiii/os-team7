@@ -4,6 +4,9 @@
 #include "sched.h"
 #include <linux/interrupt.h>
 
+static DEFINE_SPINLOCK(wrr_balancing);
+unsigned long wrr_next_balance = 0;
+
 static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
 {
 	return container_of(wrr_se, struct task_struct, wrr);
@@ -35,7 +38,9 @@ static void run_rebalance_domains_wrr(struct softirq_action *h) {
 	}
 	rcu_read_unlock();
 
-	if(min_rq == max_rq) return;
+	if(min_rq == max_rq) {
+		return;
+	}
 
 	local_irq_disable();
 	double_rq_lock(min_rq, max_rq);
@@ -102,14 +107,19 @@ static inline int on_null_domain(int cpu)
 void trigger_load_balance_wrr(struct rq *rq, int cpu)
 {
 	/* Don't need to rebalance while attached to NULL domain */
-	if (time_after_eq(jiffies, rq->wrr.next_balance) &&
-	    likely(!on_null_domain(cpu)))
+
+	spin_lock(&wrr_balancing);
+	if (time_after_eq(jiffies, wrr_next_balance) &&
+	    likely(!on_null_domain(cpu))) {
+		wrr_next_balance = wrr_next_balance + 2 * HZ;
 		raise_softirq(SCHED_SOFTIRQ_WRR);
+	}
+	spin_unlock(&wrr_balancing);
 }
 
 void init_wrr_rq(struct wrr_rq *wrr_rq, struct rq *rq) {
 	INIT_LIST_HEAD(&(wrr_rq->run_list));
-	wrr_rq->next_balance = jiffies;
+	wrr_next_balance = jiffies;
 }
 
 void enqueue_task_wrr(struct rq *rq, struct task_struct *p, int flags){
