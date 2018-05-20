@@ -60,7 +60,7 @@ In ther "test/shellScript" folder, type
 ```bash
 HOST$ ./proc_kmsg.sh
 ```
-will show printk messages. We printed "load balance visited" and "task move info" using prink function.
+will show printk messages. But current version's wrr.c didn't print any prink message. (If you restore line 16 and line 77, you can see "load balance visited" and "task move info")
 
 Type
 ```bash
