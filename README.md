@@ -93,7 +93,6 @@ You will need to open two or many terminal.
 		* int `weight` : weight of sched_wrr_entity
 		* int `time_slice` : time_slice of sched_wrr_entity
 		* struct list_head `run_list` : Linked list in rq
-		* struct wrr_rq `wrr_rq` : wrr_rq of struct_wrr_entity
 
 ### wrr_sched_class functions
 
@@ -101,12 +100,10 @@ You will need to open two or many terminal.
 	- Initialize run_list in wrr_rq
 
 * enqueue_task_wrr
-	- Set wrr_entity's wrr_rq to `rq->wrr`
 	- Add wrr_entity's run_list at tail of wrr_rq's linked list
 	- Increase nr_running
 
 * dequeue_task_wrr
-	- Set wrr_entity's wrr_rq to `NULL`
 	- Delete wrr_entity's run_list in wrr_rq's linked list
 	- Initialize wrr_entity's run_list
 	- Decrease nr_running
@@ -115,16 +112,18 @@ You will need to open two or many terminal.
 	- Move rq's current running wrr_entity to tail of wrr_rq's linked list
 
 * pick_next_task_wrr
-	- Pick first entry of the linked list. (if the list is empty, return `NULL`)
-	- return task_struct of the wrr_entity
+	- Pick first entry of the linked list (wrr task queue). 
+	- If there was no task (list was empty) return NULL. Else return task_struct of the wrr_entity
 
 * select_task_rq_wrr
 	- Used rcu_read_lock
-	- return cpu which have smallest weight sum
+	- return cpu which can have this task and has smallest weight sum
+	- This function does passive load balance.
 
 * task_tick_wrr
+	- If policy of task is not SCHED_WRR returns
 	- Decrease wrr_entity's time_slice
-	- if time_slice is zero, dequeue and enqueue the task
+	- If time_slice is zero and needs context switching (There are 2 or more tasks in run queue), move task to back of the queue and reschedule the task.
 
 * get_rr_interval_wrr
 	- return wrr_entity's time_slice

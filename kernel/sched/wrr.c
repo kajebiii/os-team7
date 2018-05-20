@@ -141,7 +141,6 @@ struct task_struct* pick_next_task_wrr (struct rq *rq){
 	struct wrr_rq *wrr_rq = &rq->wrr;
 	struct sched_wrr_entity *wrr_entity = list_first_entry_or_null(&(wrr_rq->run_list), struct sched_wrr_entity, run_list);
 	if(wrr_entity == NULL) return NULL;
-	wrr_entity->time_slice = wrr_entity->weight * HZ / 100;
 	return wrr_task_of(wrr_entity);
 }
 
@@ -150,9 +149,6 @@ void put_prev_task_wrr (struct rq *rq, struct task_struct *p){
 
 #ifdef CONFIG_SMP
 int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
-	// find cpu of task ??? passive load balance
-	// TODO: passive load balance. Look for rt.c (Done?)
-
 	struct rq *rq, *rq2;
 	int cpu, cpu2;
 
@@ -175,8 +171,6 @@ int select_task_rq_wrr (struct task_struct *p, int sd_flag, int flags){
 #endif
 
 void set_curr_task_wrr (struct rq *rq){
-//	struct task_struct *p = rq->curr;
-//	p->se.exec_start = rq->clock_task;
 }
 
 void update_curr_wrr(struct rq *rq) {
@@ -200,24 +194,20 @@ void task_tick_wrr (struct rq *rq, struct task_struct *p, int queued){
 }
 
 void switched_to_wrr (struct rq *this_rq, struct task_struct *task){
-	// Nothing to do here
 	return;
 }
 
 void prio_changed_wrr (struct rq *this_rq, struct task_struct *task, int oldprio){
-	// Nothing to do here
 	return;
 }
 
 unsigned int get_rr_interval_wrr (struct rq *rq, struct task_struct *task){
-	// round robin??
 	struct sched_wrr_entity *wrr = &task->wrr;
 	return wrr->time_slice;
 }
 
 #ifdef CONFIG_SMP
 void migrate_task_rq_wrr(struct task_struct *p, int next_cpu) {
-	// (maybe) Nothing to do here
 }
 
 #endif
