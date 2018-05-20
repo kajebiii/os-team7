@@ -42,13 +42,13 @@ static void run_rebalance_domains_wrr(struct softirq_action *h) {
 
 	min_weight_sum = min_rq->wrr.wrr_weight_sum;
 	max_weight_sum = max_rq->wrr.wrr_weight_sum;
-	entity_max_weight = (max_weight_sum - min_weight_sum) / 2;
 
 	if(min_weight_sum >= max_weight_sum) {
 		double_rq_unlock(min_rq, max_rq);
 		local_irq_enable();
 		return;
 	}
+	entity_max_weight = (max_weight_sum - min_weight_sum - 1) / 2;
 	
 	list_for_each_entry(move_entity, &(max_rq->wrr.run_list), run_list) {
 		move_task = wrr_task_of(move_entity);
