@@ -291,6 +291,18 @@ task_rq_unlock(struct rq *rq, struct task_struct *p, unsigned long *flags)
 	raw_spin_unlock_irqrestore(&p->pi_lock, *flags);
 }
 
+
+static bool check_same_owner(struct task_struct *p)
+{
+	const struct cred *cred = current_cred(), *pcred;
+	bool match;
+
+	pcred = __task_cred(p);
+	match = (uid_eq(cred->euid, pcred->euid) ||
+		 uid_eq(cred->euid, pcred->uid));
+	return match;
+}
+
 SYSCALL_DEFINE2(sched_setweight, pid_t, pid, int, weight)
 {
 	struct task_struct *tsk = NULL;
@@ -311,7 +323,12 @@ SYSCALL_DEFINE2(sched_setweight, pid_t, pid, int, weight)
 	rq = task_rq_lock(tsk, &flags);
 	if(tsk->policy != SCHED_WRR) goto end;
 	
+	ret = -EPERM;
 	// check permission
+	if(current_uid() != 0){
+		if(weight > tsk->wrr.weight) goto end;
+		if(!check_same_owner(tsk)) goto end;
+	}
 	
 	old_weight = tsk->wrr.weight;
 	tsk->wrr.weight = weight;
