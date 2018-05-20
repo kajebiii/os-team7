@@ -15,3 +15,5 @@ In original implementation of WRR run queue, process always moves to tail of run
 
 ## 5. Same process group => Same core
 
+We didn't consider task group in this project. There are task groups in linux. Two different tasks in same task group have lots of same memory with high probability. So, if tasks are in same group, assign them in same core. It will occur high probability cache hit.
+
