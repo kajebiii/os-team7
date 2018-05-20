@@ -184,17 +184,17 @@ You will need to open two or many terminal.
  * Lock related with scheduler
  	- task_struct.pi_lock : Lock of task_struct
  	- rq.lock : Lock of runqueue
-	- rcu_read_lock : Accquire when access cpu-related information. Almost every where.
+	- rcu_read_lock : Accquire when access cpu-related information. almost everywhere.
  * Assume that every callback in sched_class will call with accquired rq's lock and rcu_read_lock
  * In setweight system call, we should get rq lock of given task
- 	- core.c's task_rq_lock : accquire given task_struct's pi_lock and corresponds runqueue's lock and return runqueue
+ 	- core.c's task_rq_lock : accquire given task_struct's pi_lock and correspond runqueue's lock and return runqueue
  * In load_balance, when move task, we should get source and destination run queue's lock. 
- 	- Use core.c's double_rq_lock to get both lock with prevent deadlock
+ 	- Use core.c's double_rq_lock to get both lock for preventing deadlock
 	
 ## test/trial.c, test/while.c
 * What test code does:
 	- test/trial.c
-		* For each weight from 1~20, calculate (real) time elapsed to factorize big prime(5e6+11 = 5000011).
+		* For each weight from 1~20, calculate (real) time elapsed to factorize big prime(5e7+17 = 50000017).
 		* Repeats ITER times (which can be given as input), and prints average value.
 	- test/while.c
 		* Set random weights, and executes while loop.
