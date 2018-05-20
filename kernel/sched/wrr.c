@@ -55,7 +55,7 @@ static void run_rebalance_domains_wrr(struct softirq_action *h) {
 		if(move_entity->weight <= entity_max_weight) {
 			if(max_rq->curr != move_task) {
 				if(cpumask_test_cpu(min_cpu, tsk_cpus_allowed(move_task))) {
-					if(max_move_task != NULL || max_move_task->wrr.weight < move_task->wrr.weight) {
+					if(max_move_task == NULL || max_move_task->wrr.weight < move_task->wrr.weight) {
 						max_move_task = move_task;
 					}
 				}
