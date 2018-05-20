@@ -19,10 +19,7 @@ Recently CPUs have multiple cache hierachy. In this case, near-core share more c
 
 In case of ARM big.LITTLE CPU or multiple CPU with different speeds, each core has different performance. So normalize weight_sum to weight_sum/core_speed and do load balance. It can makes each task get fair amount of operation instead just time.
 
-## 4. Using waiting time of each task
-
-
-## 5. Same process group => Same core
+## 4. Same process group => Same core
 
 We didn't consider task group in this project. There are task groups in linux. Two different tasks in same task group have lots of same memory with high probability. So, if tasks are in same group, assign them in same core. It will occur high probability cache hit.
 
