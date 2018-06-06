@@ -1,4 +1,7 @@
 
+#ifndef _LINUX_GPS_H
+#define _LINUX_GPS_H
+
 struct gps_location {
   int lat_integer;
   int lat_fractional;
@@ -8,3 +11,5 @@ struct gps_location {
 };
 
 extern struct gps_location current_location;
+
+#endif
