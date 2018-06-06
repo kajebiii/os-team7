@@ -1349,7 +1349,7 @@ struct inode *ext2_iget (struct super_block *sb, unsigned long ino)
 	inode->i_atime.tv_nsec = inode->i_mtime.tv_nsec = inode->i_ctime.tv_nsec = 0;
 	ei->i_dtime = le32_to_cpu(raw_inode->i_dtime);
 
-	ei->i_loc.lat_integer = (signed)le32_to_cpu(raw_inode->i_lat_integer)
+	ei->i_loc.lat_integer = (signed)le32_to_cpu(raw_inode->i_lat_integer);
 	ei->i_loc.lat_fractional = (signed)le32_to_cpu(raw_inode->i_lat_fractional);
 	ei->i_loc.lng_integer = (signed)le32_to_cpu(raw_inode->i_lng_integer);
 	ei->i_loc.lng_fractional = (signed)le32_to_cpu(raw_inode->i_lng_fractional);
@@ -1595,5 +1595,6 @@ int ext2_set_gps_location(struct inode *inode) {
 int ext2_get_gps_location(struct inode *inode, struct gps_location *loc) {
 	struct ext2_inode_info *ei = EXT2_I(inode);
 	memcpy(loc, &ei->i_loc, sizeof(struct gps_location));
+	return 0;
 }
 
