@@ -1348,6 +1348,13 @@ struct inode *ext2_iget (struct super_block *sb, unsigned long ino)
 	inode->i_mtime.tv_sec = (signed)le32_to_cpu(raw_inode->i_mtime);
 	inode->i_atime.tv_nsec = inode->i_mtime.tv_nsec = inode->i_ctime.tv_nsec = 0;
 	ei->i_dtime = le32_to_cpu(raw_inode->i_dtime);
+
+	ei->i_loc.lat_integer = (signed)le32_to_cpu(raw_inode->i_lat_integer)
+	ei->i_loc.lat_fractional = (signed)le32_to_cpu(raw_inode->i_lat_fractional);
+	ei->i_loc.lng_integer = (signed)le32_to_cpu(raw_inode->i_lng_integer);
+	ei->i_loc.lng_fractional = (signed)le32_to_cpu(raw_inode->i_lng_fractional);
+	ei->i_loc.accuracy = (signed)le32_to_cpu(raw_inode->i_accuracy);
+
 	/* We now have enough fields to check if the inode was active or not.
 	 * This is needed because nfsd might try to access dead inodes
 	 * the test is that same one that e2fsck uses
@@ -1481,6 +1488,12 @@ static int __ext2_write_inode(struct inode *inode, int do_sync)
 	raw_inode->i_ctime = cpu_to_le32(inode->i_ctime.tv_sec);
 	raw_inode->i_mtime = cpu_to_le32(inode->i_mtime.tv_sec);
 
+	raw_inode->i_lat_integer = cpu_to_le32(ei->i_loc.lat_integer);
+	raw_inode->i_lat_fractional = cpu_to_le32(ei->i_loc.lat_fractional);
+	raw_inode->i_lng_integer = cpu_to_le32(ei->i_loc.lng_integer);
+	raw_inode->i_lng_fractional = cpu_to_le32(ei->i_loc.lng_fractional);
+	raw_inode->i_accuracy = cpu_to_le32(ei->i_loc.accuracy);
+
 	raw_inode->i_blocks = cpu_to_le32(inode->i_blocks);
 	raw_inode->i_dtime = cpu_to_le32(ei->i_dtime);
 	raw_inode->i_flags = cpu_to_le32(ei->i_flags);
@@ -1573,11 +1586,14 @@ int ext2_setattr(struct dentry *dentry, struct iattr *iattr)
 	return error;
 }
 
-int ext2_set_gps_location(struct inode *) {
-	//
+int ext2_set_gps_location(struct inode *inode) {
+	struct ext2_inode_info *ei = EXT2_I(inode);
+	ei->i_loc = current_location;
+	return 0; // return value????
 }
 
-int ext2_get_gps_location(struct inode *, struct gps_location *) {
-	//
+int ext2_get_gps_location(struct inode *inode, struct gps_location *loc) {
+	struct ext2_inode_info *ei = EXT2_I(inode);
+	memcpy(loc, &ei->i_loc, sizeof(struct gps_location));
 }
 
