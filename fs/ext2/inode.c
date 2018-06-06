@@ -32,6 +32,7 @@
 #include <linux/fiemap.h>
 #include <linux/namei.h>
 #include <linux/aio.h>
+#include <linux/gps.h>
 #include "ext2.h"
 #include "acl.h"
 #include "xip.h"
@@ -1571,3 +1572,12 @@ int ext2_setattr(struct dentry *dentry, struct iattr *iattr)
 
 	return error;
 }
+
+int ext2_set_gps_location(struct inode *) {
+	//
+}
+
+int ext2_get_gps_location(struct inode *, struct gps_location *) {
+	//
+}
+

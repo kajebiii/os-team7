@@ -7,3 +7,4 @@ struct gps_location {
   int accuracy;
 };
 
+extern struct gps_location current_location;
