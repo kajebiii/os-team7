@@ -420,6 +420,12 @@ struct ext2_inode {
 			__u32	h_i_author;
 		} hurd2;
 	} osd2;				/* OS dependent 2 */
+
+	__le32	i_lat_integer;
+	__le32	i_lat_fractional;
+	__le32	i_lng_integer;
+	__le32	i_lng_fractional;
+	__le32	i_accuracy;
 };
 
 /*
@@ -468,6 +474,13 @@ struct ext2_inode_large {
 			__u32	h_i_author;
 		} hurd2;
 	} osd2;				/* OS dependent 2 */
+	
+	__le32	i_lat_integer;
+	__le32	i_lat_fractional;
+	__le32	i_lng_integer;
+	__le32	i_lng_fractional;
+	__le32	i_accuracy;
+	
 	__u16	i_extra_isize;
 	__u16	i_checksum_hi;	/* crc32c(uuid+inum+inode) */
 	__u32	i_ctime_extra;	/* extra Change time (nsec << 2 | epoch) */
