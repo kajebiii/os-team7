@@ -1588,7 +1588,9 @@ int ext2_setattr(struct dentry *dentry, struct iattr *iattr)
 
 int ext2_set_gps_location(struct inode *inode) {
 	struct ext2_inode_info *ei = EXT2_I(inode);
+    spin_lock(&current_location_lock);
 	ei->i_loc = current_location;
+    spin_unlock(&current_location_lock);
 	return 0; // return value????
 }
 
