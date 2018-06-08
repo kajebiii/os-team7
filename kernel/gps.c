@@ -16,6 +16,8 @@ SYSCALL_DEFINE1(set_gps_location, struct gps_location __user *, loc) {
     if((re = copy_from_user(&temp_loc, loc, sizeof(struct gps_location))) < 0) return re;
 	if(!isBetween(temp_loc.lat_integer,  -90,  +90) || !isBetween(temp_loc.lat_fractional, 0, 999999)) return -EINVAL;
 	if(!isBetween(temp_loc.lng_integer, -180, +180) || !isBetween(temp_loc.lng_fractional, 0, 999999)) return -EINVAL;
+	if(temp_loc.lat_integer == 90 && temp_loc.lat_fractional != 0) return -EINVAL;
+	if(temp_loc.lng_integer == 180 && temp_loc.lng_fractional != 0) return -EINVAL;
 	if(!(temp_loc.accuracy >= 0)) return -EINVAL;
 	spin_lock(&current_location_lock);
 	current_location = temp_loc;
