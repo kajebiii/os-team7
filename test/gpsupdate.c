@@ -28,6 +28,9 @@ int main(void) {
 
     printf("Enter longitude fractional!\n");
     scanf("%d", &data.lng_fractional);
+
+    printf("Enter accuracy!\n");
+    scanf("%d", &data.accuracy);
     
     int err = syscall(380, &data);
 
