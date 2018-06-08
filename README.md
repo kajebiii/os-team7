@@ -1,4 +1,4 @@
-# OS Team 7 Project 3 README
+# OS Team 7 Project 4 README
 
 ## How to build kernel
 The way to build kernel does not differ from original kernel. Type `./build` in the root folder, and kernel will be built. Or you can type `make build` in the "test" folder.
