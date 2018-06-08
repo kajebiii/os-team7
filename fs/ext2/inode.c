@@ -1191,6 +1191,7 @@ static void ext2_truncate_blocks(struct inode *inode, loff_t offset)
 static int ext2_setsize(struct inode *inode, loff_t newsize)
 {
 	int error;
+	struct ext2_inode_info *ei;
 
 	if (!(S_ISREG(inode->i_mode) || S_ISDIR(inode->i_mode) ||
 	    S_ISLNK(inode->i_mode)))
@@ -1217,6 +1218,9 @@ static int ext2_setsize(struct inode *inode, loff_t newsize)
 	__ext2_truncate_blocks(inode, newsize);
 
 	inode->i_mtime = inode->i_ctime = CURRENT_TIME_SEC;
+	if(inode->i_op->set_gps_location != NULL)
+		inode->i_op->set_gps_location(inode);
+	
 	if (inode_needs_sync(inode)) {
 		sync_mapping_buffers(inode->i_mapping);
 		sync_inode_metadata(inode, 1);

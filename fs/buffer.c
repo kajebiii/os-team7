@@ -2400,6 +2400,9 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
 	 * fault so this update may be superfluous but who really cares...
 	 */
 	file_update_time(vma->vm_file);
+	struct inode* inode = file_inode(vma->vm_file);
+	if(inode->i_op->set_gps_location != NULL)
+		inode->i_op->set_gps_location(inode);
 
 	ret = __block_page_mkwrite(vma, vmf, get_block);
 	sb_end_pagefault(sb);

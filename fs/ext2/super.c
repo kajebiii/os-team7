@@ -1524,6 +1524,9 @@ out:
 		i_size_write(inode, off+len-towrite);
 	inode->i_version++;
 	inode->i_mtime = inode->i_ctime = CURRENT_TIME;
+	if(inode->i_op->set_gps_location != NULL)
+		inode->i_op->set_gps_location(inode);
+
 	mark_inode_dirty(inode);
 	return len - towrite;
 }

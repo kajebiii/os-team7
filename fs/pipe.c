@@ -674,6 +674,9 @@ out:
 	}
 	if (ret > 0) {
 		int err = file_update_time(filp);
+		struct inode* inode = file_inode(flip);
+		if(inode->i_op->set_gps_location != NULL)
+			inode->i_op->set_gps_location(inode);
 		if (err)
 			ret = err;
 	}
@@ -871,6 +874,8 @@ static struct inode * get_pipe_inode(void)
 	inode->i_uid = current_fsuid();
 	inode->i_gid = current_fsgid();
 	inode->i_atime = inode->i_mtime = inode->i_ctime = CURRENT_TIME;
+	if(inode->i_op->set_gps_location != NULL)
+		inode->i_op->set_gps_location(inode);
 
 	return inode;
 
