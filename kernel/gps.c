@@ -36,6 +36,7 @@ SYSCALL_DEFINE2(get_gps_location, const char __user *, pathname_user, struct gps
 	// should be check -EACCES!!!!
 	long pathname_len;
 	char *pathname;
+	struct gps_location loc;
 	long err;
 	struct inode* inode;
 	if (access_ok(VERIFY_WRITE, loc_user, sizeof(struct gps_location)) == 0) return -EINVAL; // Correct?
@@ -46,8 +47,10 @@ SYSCALL_DEFINE2(get_gps_location, const char __user *, pathname_user, struct gps
 	pathname = kmalloc(pathname_len * sizeof(char), GFP_KERNEL);
 	if((err = strncpy_from_user(pathname, pathname_user, pathname_len)) < 0) goto error;
 	inode = get_inode_from_pathname(pathname);
+	printk("[GETGPS] %d", inode->i_ino);
 	if(inode->i_op->get_gps_location) {
-		inode->i_op->get_gps_location(inode, loc_user);
+		inode->i_op->get_gps_location(inode, &loc);
+    	if((err = copy_to_user(loc_user, &loc, sizeof(struct gps_location))) < 0) goto error;
 	}else{
 		err = -ENODEV;
 		goto error;
