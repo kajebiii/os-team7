@@ -18,3 +18,10 @@ $(TARGET_2) : $(OBJS_2)
 
 clean:
 	rm -r $(OBJS_1) $(TARGET_1) $(OBJS_2) $(TARGET_2)
+
+build:
+	cd .. && ./build
+lthor:
+	cd .. && lthor image.tar
+run:
+	sdb root on && sdb push $(TARGET_1) /root/$(TARGET_1) && sdb push $(TARGET_2) /root/$(TARGET_2)
