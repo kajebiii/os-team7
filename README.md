@@ -11,6 +11,7 @@
 
 * **Helpful Links**
   * [get inode form path](https://stackoverflow.com/questions/27869570/retrieving-inode-struct-given-the-path-to-a-file)
+  * [ftrace](https://linuxkernelmsg.wordpress.com/2017/01/11/%EB%B2%88%EC%97%AD-lwn-debugging-the-kernel-using-ftrace%E2%80%8A-%E2%80%8Apart-1/)
 
 ## Project 3
 
