@@ -2,7 +2,7 @@
 
 ## Project 4
 
-* [Project 3 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project4.md)  
+* [Project 4 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project4.md)  
 * Assigned: 2017-05-20 Sunday 21:00:00 KST
 * Design Review Due: 2017-06-04 Monday KST
 * **Due: 2017-06-12 Tuesday 20:59:59 KST**
