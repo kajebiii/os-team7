@@ -20,14 +20,19 @@ int main(int argc, char **args) {
         return 0;
     }
     
-    syscall(381, args[1], &result);
+    int err = syscall(381, args[1], &result);
 
-    printf("latitude:\t%d.%06d\n", result.lat_integer, result.lat_fractional);
-    printf("longitude:\t%d.%06d\n", result.lng_integer, result.lng_fractional);
-    printf("accuracy:\t%d(m)\n\n", result.accuracy);
+	if(err < 0) {
+		printf("Error %d\n", errno);
+		return 0;
+	}else{
+		printf("latitude:\t%d.%06d\n", result.lat_integer, result.lat_fractional);
+		printf("longitude:\t%d.%06d\n", result.lng_integer, result.lng_fractional);
+		printf("accuracy:\t%d(m)\n\n", result.accuracy);
 
-    printf("Google Map Link\n");
-    printf("https://www.google.com/maps/@%d.%06d,%d.%06d,15z\n", result.lat_integer, result.lat_fractional, result.lng_integer, result.lng_fractional);
+		printf("Google Map Link\n");
+		printf("https://www.google.com/maps/@%d.%06d,%d.%06d,15z\n", result.lat_integer, result.lat_fractional, result.lng_integer, result.lng_fractional);
+	}
 
     return 0;
 }

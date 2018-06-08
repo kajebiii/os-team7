@@ -24,4 +24,4 @@ build:
 lthor:
 	cd .. && lthor image.tar
 run:
-	sdb root on && sdb push $(TARGET_1) /root/$(TARGET_1) && sdb push $(TARGET_2) /root/$(TARGET_2)
+	sdb root on && sdb push $(TARGET_1) /root/$(TARGET_1) && sdb push $(TARGET_2) /root/$(TARGET_2) && sdb push ../proj4.fs /root/proj4.fs
