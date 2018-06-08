@@ -10,7 +10,7 @@
 * [Our submission branch](https://github.com/swsnu/os-team7/tree/proj4)
 
 * **Helpful Links**
-  * [link1](https://elixir.bootlin.com/linux/v3.10/source)
+  * [get inode form path](https://stackoverflow.com/questions/27869570/retrieving-inode-struct-given-the-path-to-a-file)
 
 ## Project 3
 
