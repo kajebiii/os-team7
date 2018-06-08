@@ -7,12 +7,20 @@
 struct gps_location current_location = {0, 0, 0, 0, 0};
 DEFINE_SPINLOCK(current_location_lock);
 
+int isBetween(int k, int x, int y) {
+	return x <= k && k <= y;
+}
 SYSCALL_DEFINE1(set_gps_location, struct gps_location __user *, loc) {
     int re;
-    spin_lock(&current_location_lock);
-    re = copy_from_user(&current_location, loc, sizeof(struct gps_location));
-    spin_unlock(&current_location_lock);
-    return re;
+	struct gps_location temp_loc;
+    if((re = copy_from_user(&temp_loc, loc, sizeof(struct gps_location))) < 0) return re;
+	if(!isBetween(temp_loc.lat_integer,  -90,  +90) || !isBetween(temp_loc.lat_fractional, 0, 999999)) return -EINVAL;
+	if(!isBetween(temp_loc.lng_integer, -180, +180) || !isBetween(temp_loc.lng_fractional, 0, 999999)) return -EINVAL;
+	if(!(temp_loc.accuracy >= 0)) return -EINVAL;
+	spin_lock(&current_location_lock);
+	current_location = temp_loc;
+	spin_unlock(&current_location_lock);
+    return 0;
 }
 
 struct inode* get_inode_from_pathname(const char *pathname) {
@@ -20,7 +28,6 @@ struct inode* get_inode_from_pathname(const char *pathname) {
     kern_path(pathname, LOOKUP_FOLLOW, &path);
     return path.dentry->d_inode;
 }
-
 
 //On success, the system call should return 0 and *loc should be filled with location information for the specified file.
 //This should fail with -EACCES when file not is readable by the current user.
