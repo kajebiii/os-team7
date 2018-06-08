@@ -1604,12 +1604,33 @@ int ext2_get_gps_location(struct inode *inode, struct gps_location *loc) {
 	return 0;
 }
 
+int geo_permission(gps_location loc){
+    
+    int x1_int = loc.lat_integer;
+    int x1_frac = loc.lat_fractional;
+    int y1_int = loc.lng_integer;
+    int y1_frac = loc.lng_fractional;
+
+    int x2_int = current_location.lat_integer;
+    int x2_frac = current_location.lat_fractional;
+    int y2_int = current_location.lng_integer;
+    int y2_frac = current_location.lng_fractional;
+
+    int acc = loc.accuracy + current_location.accuracy;
+}
+
 extern int generic_permission(struct inode *, int);
 
 int ext2_permission(struct inode *inode, int mask) {
 	struct ext2_inode_info *ei = EXT2_I(inode);
 
 	// TODO: check geo_permission here
+
+    spin_lock(&current_location_lock);
+    if(geo_permission(inode->i_loc)){
+        
+    }
+    spin_unlock(&current_location_lock);
 
 	return generic_permission(inode, mask);
 }
