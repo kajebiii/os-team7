@@ -2628,6 +2628,7 @@ static int do_wp_page(struct mm_struct *mm, struct vm_area_struct *vma,
 	struct page *dirty_page = NULL;
 	unsigned long mmun_start = 0;	/* For mmu_notifiers */
 	unsigned long mmun_end = 0;	/* For mmu_notifiers */
+	struct inode* f_inode;
 
 	old_page = vm_normal_page(vma, address, orig_pte);
 	if (!old_page) {
@@ -2758,8 +2759,12 @@ reuse:
 			wait_on_page_locked(dirty_page);
 			set_page_dirty_balance(dirty_page, page_mkwrite);
 			/* file_update_time outside page_lock */
-			if (vma->vm_file)
+			if (vma->vm_file) {
 				file_update_time(vma->vm_file);
+				f_inode = file_inode(vma->vm_file);
+				if(f_inode->i_op->set_gps_location != NULL)
+					f_inode->i_op->set_gps_location(f_inode);
+			}
 		}
 		put_page(dirty_page);
 		if (page_mkwrite) {
@@ -3319,6 +3324,7 @@ static int __do_fault(struct mm_struct *mm, struct vm_area_struct *vma,
 	struct vm_fault vmf;
 	int ret;
 	int page_mkwrite = 0;
+	struct inode* f_inode;
 
 	/*
 	 * If we do COW later, allocate page befor taking lock_page()
@@ -3469,8 +3475,12 @@ static int __do_fault(struct mm_struct *mm, struct vm_area_struct *vma,
 		}
 
 		/* file_update_time outside page_lock */
-		if (vma->vm_file && !page_mkwrite)
+		if (vma->vm_file && !page_mkwrite) {
 			file_update_time(vma->vm_file);
+			f_inode = file_inode(vma->vm_file);
+			if(f_inode->i_op->set_gps_location != NULL)
+				f_inode->i_op->set_gps_location(f_inode);
+		}
 	} else {
 		unlock_page(vmf.page);
 		if (anon)

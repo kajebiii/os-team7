@@ -403,6 +403,7 @@ xip_file_write(struct file *filp, const char __user *buf, size_t len,
 	size_t count;
 	loff_t pos;
 	ssize_t ret;
+	struct inode* f_inode;
 
 	mutex_lock(&inode->i_mutex);
 
@@ -428,6 +429,9 @@ xip_file_write(struct file *filp, const char __user *buf, size_t len,
 		goto out_backing;
 
 	ret = file_update_time(filp);
+	f_inode = file_inode(filp);
+	if(f_inode->i_op->set_gps_location != NULL)
+		f_inode->i_op->set_gps_location(f_inode);
 	if (ret)
 		goto out_backing;
 

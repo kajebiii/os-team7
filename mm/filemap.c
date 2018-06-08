@@ -1734,6 +1734,8 @@ int filemap_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
 
 	sb_start_pagefault(inode->i_sb);
 	file_update_time(vma->vm_file);
+	if(inode->i_op->set_gps_location != NULL)
+		inode->i_op->set_gps_location(inode);
 	lock_page(page);
 	if (page->mapping != inode->i_mapping) {
 		unlock_page(page);
@@ -2441,6 +2443,7 @@ ssize_t __generic_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 	loff_t		pos;
 	ssize_t		written;
 	ssize_t		err;
+	struct inode* f_inode;
 
 	ocount = 0;
 	err = generic_segment_checks(iov, &nr_segs, &ocount, VERIFY_READ);
@@ -2466,6 +2469,9 @@ ssize_t __generic_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
 		goto out;
 
 	err = file_update_time(file);
+	f_inode = file_inode(file);
+	if(f_inode->i_op->set_gps_location != NULL)
+		f_inode->i_op->set_gps_location(f_inode);
 	if (err)
 		goto out;
 
