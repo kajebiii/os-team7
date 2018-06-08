@@ -1035,6 +1035,8 @@ generic_file_splice_write(struct pipe_inode_info *pipe, struct file *out,
 		ret = file_remove_suid(out);
 		if (!ret) {
 			ret = file_update_time(out);
+			if(inode->i_op->set_gps_location != NULL)
+				inode->i_op->set_gps_location(inode);
 			if (!ret)
 				ret = splice_from_pipe_feed(pipe, &sd,
 							    pipe_to_file);
