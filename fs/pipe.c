@@ -674,7 +674,7 @@ out:
 	}
 	if (ret > 0) {
 		int err = file_update_time(filp);
-		struct inode* inode = file_inode(flip);
+		struct inode* inode = file_inode(filp);
 		if(inode->i_op->set_gps_location != NULL)
 			inode->i_op->set_gps_location(inode);
 		if (err)
