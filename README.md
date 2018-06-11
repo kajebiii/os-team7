@@ -130,6 +130,19 @@ You may need to open two or many terminal.
 		
 ## Main implementation 
 * [kernel/gps.c](https://github.com/swsnu/os-team7/blob/proj4/kernel/gps.c)
+	* current_location: Global variable contains system's current location
+	* set_gps_location syscall
+		* Get user's location input and check whether it's valid.
+		* Change current_location global variable.
+		* return 0 on success, -EINVAL on invalid location input.
+	* get_gps_location syscall
+		* Get user's pathname and check whether it's valid.
+		* Check whether pathname points to valid file.
+		* Check user's permission to file.
+		* Get file's current location and distance, and check whether it's valid.
+		* Write file's current location to user pointer, and returns.
+		* return 0 on success, -ENOENT on invalid filepath, -EFAULT on invalid user pointer, -EINVAL on invalid path name, -EACCES on no permission, -ENODEV on invalid gps position.
+
 * [fs/ext2/inode.c](https://github.com/swsnu/os-team7/blob/proj4/fs/ext2/inode.c)
 
 ## Other modified files to set gps location
