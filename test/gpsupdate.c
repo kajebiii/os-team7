@@ -35,8 +35,8 @@ int main(void) {
     int err = syscall(380, &data);
 
     if(err < 0){
-        printf("Update fail!\n");
-        printf("%s\n", strerror(errno));
+        printf("GpsUpdate fail!\n");
+		printf("Error %d, %s\n", errno, strerror(errno));
     }
     else {
         printf("Update success!\n");
