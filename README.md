@@ -173,6 +173,18 @@ You may need to open two or many terminal.
 * [mm/memory.c](https://github.com/swsnu/os-team7/blob/proj4/mm/memory.c)
 
 ## How to calculate distance between two points
+* long long Div(long long a, long long b)
+	* In the kernel, we can't use divide operation(/) between two long long values.
+	* Use opertiaon(<<, >>, +, -) only
+* int cosine(long long a)
+	* Get value using taylor expansion method
+	* return cos(a / 1000000) value
+	* ![cos](https://wikimedia.org/api/rest_v1/media/math/render/svg/b76af64626b80d6f66bdb964e1794c373b611479)
+* int sine(long long a)
+	* Get value using taylor expansion method
+	* return sin(a / 1000000) value
+	* ![sine](https://wikimedia.org/api/rest_v1/media/math/render/svg/def345e147219a7892eb8140dfeb1c77b29dce38)
+
 
 ## EXTRA: ext4
 
