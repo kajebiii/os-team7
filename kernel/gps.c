@@ -27,8 +27,10 @@ SYSCALL_DEFINE1(set_gps_location, struct gps_location __user *, loc) {
 
 struct inode* get_inode_from_pathname(const char *pathname) {
     struct path path;
-    kern_path(pathname, LOOKUP_FOLLOW, &path);
-    return path.dentry->d_inode;
+    if(kern_path(pathname, LOOKUP_FOLLOW, &path) == 0)
+    	return path.dentry->d_inode;
+	else
+		return NULL;
 }
 
 //On success, the system call should return 0 and *loc should be filled with location information for the specified file.
@@ -41,7 +43,7 @@ SYSCALL_DEFINE2(get_gps_location, const char __user *, pathname_user, struct gps
 	struct gps_location loc;
 	long err;
 	struct inode* inode;
-	if (access_ok(VERIFY_WRITE, loc_user, sizeof(struct gps_location)) == 0) return -EINVAL; // Correct?
+	if (access_ok(VERIFY_WRITE, loc_user, sizeof(struct gps_location)) == 0) return -EFAULT; // Correct?
 
 	pathname_len = strlen_user(pathname_user);
 	if(pathname_len <= 0) return -EINVAL; // Correct?
@@ -49,7 +51,14 @@ SYSCALL_DEFINE2(get_gps_location, const char __user *, pathname_user, struct gps
 	pathname = kmalloc(pathname_len * sizeof(char), GFP_KERNEL);
 	if((err = strncpy_from_user(pathname, pathname_user, pathname_len)) < 0) goto error;
 	inode = get_inode_from_pathname(pathname);
-	printk("[GETGPS] %d", inode->i_ino);
+	if(inode == NULL) {
+		err = -ENOENT;
+		goto error;
+	}
+	if(generic_permission(inode, MAY_READ) != 0) {
+		err = -EACCES;
+		goto error;
+	}
 	if(inode->i_op->get_gps_location) {
 		inode->i_op->get_gps_location(inode, &loc);
     	if((err = copy_to_user(loc_user, &loc, sizeof(struct gps_location))) < 0) goto error;
