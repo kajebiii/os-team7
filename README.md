@@ -144,6 +144,17 @@ You may need to open two or many terminal.
 		* return 0 on success, -ENOENT on invalid filepath, -EFAULT on invalid user pointer, -EINVAL on invalid path name, -EACCES on no permission, -ENODEV on invalid gps position.
 
 * [fs/ext2/inode.c](https://github.com/swsnu/os-team7/blob/proj4/fs/ext2/inode.c)
+	* ext2_set_gps_location
+	 	* Set inode's location to current location.
+	* ext2_get_gps_location
+		* Get inode's location value to designated pointer.
+	* ext2_permission
+		* Calls geo_permission function to check whether location is valid or not.
+		* If geo_permission fails, returns -EACCES. Else, calls generic_permission and returns.
+	* geo_permission
+		* Calculates distance between file's current location and device's current location, and check whether it's valid.
+		* If two location can be same, returns 1. else returns 0.
+		* Methods used to calculate distance are described below section.
 
 ## Other modified files to set gps location
 * [fs/attr.c](https://github.com/swsnu/os-team7/blob/proj4/fs/attr.c)
@@ -161,6 +172,9 @@ You may need to open two or many terminal.
 * [mm/filemap_xip.c](https://github.com/swsnu/os-team7/blob/proj4/mm/filemap_xip.c)
 * [mm/memory.c](https://github.com/swsnu/os-team7/blob/proj4/mm/memory.c)
 
+## How to calculate distance between two points
+
+## EXTRA: ext4
 
 ## Any lessons learned
 * TODO
