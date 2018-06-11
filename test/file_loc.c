@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <string.h>
 
 struct gps_location {
   int lat_integer;
@@ -23,7 +24,8 @@ int main(int argc, char **args) {
     int err = syscall(381, args[1], &result);
 
 	if(err < 0) {
-		printf("Error %d\n", errno);
+        printf("File_Loc fail!\n");
+		printf("Error %d, %s\n", errno, strerror(errno));
 		return 0;
 	}else{
 		printf("latitude:\t%d.%06d\n", result.lat_integer, result.lat_fractional);
