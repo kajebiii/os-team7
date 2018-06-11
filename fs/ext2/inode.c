@@ -1683,7 +1683,7 @@ int geo_permission(struct gps_location loc){
     long long acc = loc.accuracy;
 
     int M = 1000000;
-    long long L = 20000;
+    long long L = 20000000;
 
     int xx1 = x1_int * M + x1_frac;
     int yy1 = y1_int * M + y1_frac;
@@ -1693,7 +1693,7 @@ int geo_permission(struct gps_location loc){
     int dx = xx2 - xx1;
     int dy = yy2 - yy1;
 
-    long long t1 = dy * L * cosine((xx1 + xx2)/2) / M / 180 / M;
+    long long t1 = dy * (L/M) * cosine((xx1 + xx2)/2) / 180 / M;
     long long t2 = L * dx / 180 / M;
     acc += current_location.accuracy;
 
