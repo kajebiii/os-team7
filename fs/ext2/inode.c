@@ -1604,68 +1604,73 @@ int ext2_get_gps_location(struct inode *inode, struct gps_location *loc) {
 	return 0;
 }
 
-/*
-long long Div(long long a, long long b){
-    int c = 0;
-    long long res = 0;
-    int i;
-    if(a<0) return -Div(-a,b);
-    if(b<0) return -Div(a,-b);
-    while(b<a){
-        b<<=1;
-        c++;
-    }
-    for(i=c;i>=0;i--){
-        if(a>=b){
-            a -= b;
-            res += (1ll<<i);
-        }
-        b>>=1;
-    }
-}*/
-
-int cosine(long long a);
-
-int sine(long long a){
-    int M = 1000000, ck = 1, res;
-    long long t5;
-    if(a < 0){
-        a = -a;
-        ck = -1;
-    }
-    if(a > 90*M){
-        a = 180*M-a;
-    }
-    if(a > 45*M){
-        res = cosine(90*M-a);
-    }
-    else{
-        a = a*3141593/(180*M);
-        t5 = a*a/M*a/M*a/M*a/M;
-        res= (int)(a - a*a/M*a/M/6 + t5/120 - t5*a/M*a/M/5040 + t5*a/M*a/M/5040*a/M*a/M/72);
-    }
-    res = res*ck;
+long long cosine(long long a);
+long long Div(long long a, long long b) {
+	int c = 0;
+	long long res = 0;
+	int i;
+	if (a<0) return -Div(-a, b);
+	if (b<0) return -Div(a, -b);
+	while (b<a) {
+		b <<= 1;
+		c++;
+	}
+	for (i = c; i >= 0; i--) {
+		if (a >= b) {
+			a -= b;
+			res += (1ll << i);
+		}
+		b >>= 1;
+	}
+	return res;
 }
 
-int cosine(long long a){
-    int M = 1000000, ck = 1, res;
-    long long t4;
-    if(a < 0)a = -a;
+long long sine(long long a) {
+	int M = 1000000, ck = 1, res, i;
+	long long u[7];
+	if (a < 0) {
+		a = -a;
+		ck = -1;
+	}
+	if (a > 90 * M) {
+		a = 180 * M - a;
+	}
+	if (a > 45 * M) {
+		res = cosine(90 * M - a);
+	}
+	else {
+		a = Div(a * 3141593, (180 * M));
+		u[0] = a;
+		for (i = 1; i < 6; i++) {
+			u[i] = Div(Div(u[i - 1] * a, M)*a, M);
+		}
+		res = (int)(u[0] - Div(u[1], 6) + Div(u[2], 120) - Div(u[3], 5040) + Div(u[4], 362880));
+	}
+	return res*ck;
+}
 
-    if(a > 90*M){
-        ck = -1;
-        a = 180*M-a;
-    }
+long long cosine(long long a) {
+	int M = 1000000, ck = 1, res, i;
+	long long u[7];
+	if (a < 0)a = -a;
 
-    if(a > 45*M){
-        res = sine(90*M-a);
-    }
-    else{
-        a = a*3141593/(180*M);
-        t4 = a*a/M*a/M*a/M;
-        res = (int)(M - a*a/M/2 + t4/24 - t4*a/M*a/M/720 + t4*a/M*a/M/720*a/M*a/M/56);
-    }
-    return res * ck;
+	if (a > 90 * M) {
+		ck = -1;
+		a = 180 * M - a;
+	}
+
+	if (a > 45 * M) {
+		res = sine(90 * M - a);
+	}
+	else {
+		a = Div(a * 3141593, (180 * M));
+		u[0] = M;
+		for (i = 1; i <= 6; i++) {
+			u[i] = Div(Div(u[i - 1] * a, M)*a, M);
+		}
+		res = (int)(u[0] - Div(u[1], 2) + Div(u[2], 24) - Div(u[3], 720) + Div(u[4], 40320) + Div(u[5], 3628800));
+	}
+	return res * ck;
 }
 
 int geo_permission(struct gps_location loc){
@@ -1683,7 +1688,8 @@ int geo_permission(struct gps_location loc){
     long long acc = loc.accuracy;
 
     int M = 1000000;
-    long long L = 20000000;
+    long long R = 6400;
+    long long L = 20000;
 
     int xx1 = x1_int * M + x1_frac;
     int yy1 = y1_int * M + y1_frac;
@@ -1693,8 +1699,8 @@ int geo_permission(struct gps_location loc){
     int dx = xx2 - xx1;
     int dy = yy2 - yy1;
 
-    long long t1 = dy * (L/M) * cosine((xx1 + xx2)/2) / 180 / M;
-    long long t2 = L * dx / 180 / M;
+	long long t1 = Div(Div(dy * Div(L, M) * cosine((xx1 + xx2) / 2), 180), M);
+	long long t2 = Div(Div(L * dx, 180), M);
     acc += current_location.accuracy;
 
     if((t1*t1+t2*t2) > acc*acc)return 0;
@@ -1713,7 +1719,6 @@ int ext2_permission(struct inode *inode, int mask) {
 
         spin_lock(&current_location_lock);
         if(!geo_permission(ei->i_loc)){
-			spin_unlock(&current_location_lock);
             return -EACCES;
         }
         spin_unlock(&current_location_lock);
