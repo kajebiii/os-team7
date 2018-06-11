@@ -2118,6 +2118,9 @@ extern int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf);
 extern qsize_t *ext4_get_reserved_space(struct inode *inode);
 extern void ext4_da_update_reserve_space(struct inode *inode,
 					int used, int quota_claim);
+extern int ext4_set_gps_location(struct inode *);
+extern int ext4_get_gps_location(struct inode *, struct gps_location *);
+extern int ext4_permission(struct inode *, int);
 
 /* indirect.c */
 extern int ext4_ind_map_blocks(handle_t *handle, struct inode *inode,
@@ -2650,9 +2653,6 @@ extern int ext4_find_delalloc_range(struct inode *inode,
 extern int ext4_find_delalloc_cluster(struct inode *inode, ext4_lblk_t lblk);
 extern int ext4_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
 			__u64 start, __u64 len);
-extern int ext4_set_gps_location(struct inode *);
-extern int ext4_get_gps_location(struct inode *, struct gps_location *);
-extern int ext4_permission(struct inode *, int);
 
 /* move_extent.c */
 extern void ext4_double_down_write_data_sem(struct inode *first,

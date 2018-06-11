@@ -39,6 +39,7 @@
 #include <linux/ratelimit.h>
 #include <linux/aio.h>
 #include <linux/bitops.h>
+#include <linux/gps.h>
 
 #include "ext4_jbd2.h"
 #include "xattr.h"
@@ -5320,4 +5321,21 @@ out_ret:
 out:
 	sb_end_pagefault(inode->i_sb);
 	return ret;
+}
+
+int ext4_set_gps_location(struct inode *inode) {
+	struct gps_location tmp;
+	spin_lock(&current_location_lock);
+	memcpy(&tmp, &current_location, sizeof(struct gps_location));
+	spin_unlock(&current_location_lock);
+	return ext4_xattr_set(inode, EXT4_XATTR_INDEX_SYSTEM, "gps_location", &tmp, sizeof(struct gps_location), 0);
+}
+
+int ext4_get_gps_location(struct inode *inode, struct gps_location *loc) {
+	return ext4_xattr_get(inode, EXT4_XATTR_INDEX_SYSTEM, "gps_location", loc, sizeof(struct gps_location));
+}
+
+extern int generic_permission(struct inode *, int);
+int ext4_permission(struct inode * inode, int mask) {
+	return generic_permission(inode, mask);
 }
