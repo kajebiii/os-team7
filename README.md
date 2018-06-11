@@ -139,7 +139,7 @@ You may need to open two or many terminal.
 		* Get user's pathname and check whether it's valid.
 		* Check whether pathname points to valid file.
 		* Check user's permission to file.
-		* Get file's current location and distance, and check whether it's valid.
+		* Get file's current location
 		* Write file's current location to user pointer, and returns.
 		* return 0 on success, -ENOENT on invalid filepath, -EFAULT on invalid user pointer, -EINVAL on invalid path name, -EACCES on no permission, -ENODEV on invalid gps position.
 
