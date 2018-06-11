@@ -139,7 +139,7 @@ You may need to open two or many terminal.
 		* Get user's pathname and check whether it's valid.
 		* Check whether pathname points to valid file.
 		* Check user's permission to file.
-		* Get file's current location and distance, and check whether it's valid.
+		* Get file's current location
 		* Write file's current location to user pointer, and returns.
 		* return 0 on success, -ENOENT on invalid filepath, -EFAULT on invalid user pointer, -EINVAL on invalid path name, -EACCES on no permission, -ENODEV on invalid gps position.
 
@@ -173,8 +173,41 @@ You may need to open two or many terminal.
 * [mm/memory.c](https://github.com/swsnu/os-team7/blob/proj4/mm/memory.c)
 
 ## How to calculate distance between two points
+* Assumtion
+	* Earth is a perfect sphere
+	* TODO? TODO?
+* long long Div(long long a, long long b)
+	* In the kernel, we can't use divide operation(/) between two long long values.
+	* Use opertiaon(<<, >>, +, -) only
+	* TODO
+* int cosine(long long a)
+	* ![cos](https://wikimedia.org/api/rest_v1/media/math/render/svg/b76af64626b80d6f66bdb964e1794c373b611479)
+	* Get value using taylor expansion method
+	* Caculate to fifth terms
+	* return cos(a / 1000000) value
+* int sine(long long a)
+	* ![sine](https://wikimedia.org/api/rest_v1/media/math/render/svg/def345e147219a7892eb8140dfeb1c77b29dce38)
+	* Get value using taylor expansion method
+	* Caculate to fifth terms
+	* return sin(a / 1000000) value
 
 ## EXTRA: ext4
+* [Our submission branch (ext4)](https://github.com/swsnu/os-team7/tree/proj4-ext4)
+* ext4 is quite similar to ext2, but following are different from ext2
+### Main implementation 
+* [kernel/gps.c](https://github.com/swsnu/os-team7/blob/proj4-ext4/fs/ext4/inode.c)
+	* ext4_set_gps_location
+		* set gps_location value using ext4_xattr_set function
+	* ext4_get_gps_location
+		* get gps_location value using ext4_xattr_get function
+		* when there is no gps_location in file ... TODO TODO TODO
+	* ext4_permission
+		* TODO
+### Other modified files to set gps location
+* [kernel/gps.c](https://github.com/swsnu/os-team7/blob/proj4-ext4/fs/ext4/inode.c)
+	* ext4_page_mkwrite
+		* kernel funciton
+		* add set_gps_location(inode) after update_time function called
 
 ## Any lessons learned
 * TODO
