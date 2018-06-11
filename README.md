@@ -183,12 +183,12 @@ You may need to open two or many terminal.
 * int cosine(long long a)
 	* ![cos](https://wikimedia.org/api/rest_v1/media/math/render/svg/b76af64626b80d6f66bdb964e1794c373b611479)
 	* Get value using taylor expansion method
-	* Caculate to fifth term
+	* Caculate to fifth terms
 	* return cos(a / 1000000) value
 * int sine(long long a)
 	* ![sine](https://wikimedia.org/api/rest_v1/media/math/render/svg/def345e147219a7892eb8140dfeb1c77b29dce38)
 	* Get value using taylor expansion method
-	* Caculate to fifth term
+	* Caculate to fifth terms
 	* return sin(a / 1000000) value
 
 ## EXTRA: ext4
