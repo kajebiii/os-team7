@@ -140,7 +140,7 @@ You may need to open two or many terminal.
 * [fs/ext2/ialloc.c](https://github.com/swsnu/os-team7/blob/proj4/fs/ext2/ialloc.c)
 * [fs/ext2/inode.c](https://github.com/swsnu/os-team7/blob/proj4/fs/ext2/inode.c)
 * [fs/ext2/super.c](https://github.com/swsnu/os-team7/blob/proj4/fs/ext2/super.c)
-* [fs/libfs.c]((https://github.com/swsnu/os-team7/blob/proj4/fs/libfs.c)
+* [fs/libfs.c](https://github.com/swsnu/os-team7/blob/proj4/fs/libfs.c)
 * [fs/pipe.c](https://github.com/swsnu/os-team7/blob/proj4/fs/pipe.c)
 * [fs/splice.c](https://github.com/swsnu/os-team7/blob/proj4/fs/splice.c)
 * [kernel/gps.c](https://github.com/swsnu/os-team7/blob/proj4/kernel/gps.c)
