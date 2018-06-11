@@ -1647,6 +1647,7 @@ int ext2_permission(struct inode *inode, int mask) {
 
         spin_lock(&current_location_lock);
         if(!geo_permission(ei->i_loc)){
+			spin_unlock(&current_location_lock);
             return -EACCES;
         }
         spin_unlock(&current_location_lock);
