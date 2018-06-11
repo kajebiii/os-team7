@@ -173,13 +173,16 @@ You may need to open two or many terminal.
 * [mm/memory.c](https://github.com/swsnu/os-team7/blob/proj4/mm/memory.c)
 
 ## How to calculate distance between two points
-* Assumtion
+* Assumption
 	* Earth is a perfect sphere
+	* GPS accuracy will be very small than Earth's radius (?)
 	* TODO? TODO?
 * long long Div(long long a, long long b)
 	* In the kernel, we can't use divide operation(/) between two long long values.
 	* Use opertiaon(<<, >>, +, -) only
-	* TODO
+	* When a < 0, return -Div(-a, b) / When b < 0, return -Div(a, -b)
+	* Find minimum integer c that satisfy b * 2^c >= a
+	* Use division algorithm in binary system (learned in elementary school)
 * int cosine(long long a)
 	* ![cos](https://wikimedia.org/api/rest_v1/media/math/render/svg/b76af64626b80d6f66bdb964e1794c373b611479)
 	* Get value using taylor expansion method
