@@ -40,16 +40,69 @@ HOST$ make clean
 HOST$ make
 HOST$ make run
 ```
-Then, It will compile test codes and transfer our test excutable files between the device and your PC.
+Then, It will compile test codes (includes file_loc.c, gpsupdate.c) and transfer our test excutable files (includes file_loc, gpsupdate) between the device and your PC.
+Also, it will transfer proj4.fs. pro4.fs have one directory(named "directory") and two files(named "snu301" and "snu25").
 
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
+The following is output of `file_loc` when called on our files and directory.
+```
+BOARD$ mkdir /root/proj4
+BOARD$ cd /root/
+BOARD$ mount -o loop -t ext2 /root/proj4.fs /root/proj4
+BOARD$ cd /root/proj4
+BOARD$ ../file_loc snu301
+latitude:       37.450005
+longitude:      126.952366
+accuracy:       50(m)
 
-You will need to open two or many terminal.
+Google Map Link
+https://www.google.com/maps/@37.450005,126.952366,15z
+BOARD$ ../file_loc snu25
+latitude:       37.458773
+longitude:      126.949533
+accuracy:       50(m)
+
+Google Map Link
+https://www.google.com/maps/@37.458773,126.949533,15z
+BOARD$ ../file_loc directory
+File_Loc fail!
+Error 19, No such device
+```
+
+And if you call `gpsupdate` you can change your location. The following is example.
+```
+BOARD$ /root/gpsupdate
+Enter latitude integer!
+39
+Enter latitude fractional!
+123145
+Enter longitude integer!
+130
+Enter longitude fractional!
+977235
+Enter accuracy!
+731
+Update success!
+BOARD$ /root/gpsupdate
+Enter latitude integer!
+89
+Enter latitude fractional!
+123123
+Enter longitude integer!
+180
+Enter longitude fractional!
+1
+Enter accuracy!
+1
+GpsUpdate fail!
+Error 22, Invalid argument
+```
+
+After testing, recommmend to execute following command for unmount
+```
+BOARD$ umount -dl /root/proj4
+```
+
+You may need to open two or many terminal.
 
 
 ## [Comparing changes](https://github.com/swsnu/os-team7/compare/base...proj4)
