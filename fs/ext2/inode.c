@@ -1604,6 +1604,70 @@ int ext2_get_gps_location(struct inode *inode, struct gps_location *loc) {
 	return 0;
 }
 
+/*
+long long Div(long long a, long long b){
+    int c = 0;
+    long long res = 0;
+    int i;
+    if(a<0) return -Div(-a,b);
+    if(b<0) return -Div(a,-b);
+    while(b<a){
+        b<<=1;
+        c++;
+    }
+    for(i=c;i>=0;i--){
+        if(a>=b){
+            a -= b;
+            res += (1ll<<i);
+        }
+        b>>=1;
+    }
+}*/
+
+int cosine(long long a);
+
+int sine(long long a){
+    int M = 1000000, ck = 1, res;
+    long long t5;
+    if(a < 0){
+        a = -a;
+        ck = -1;
+    }
+    if(a > 90*M){
+        a = 180*M-a;
+    }
+    if(a > 45*M){
+        res = cosine(90*M-a);
+    }
+    else{
+        a = a*3141593/(180*M);
+        t5 = a*a/M*a/M*a/M*a/M;
+        res= (int)(a - a*a/M*a/M/6 + t5/120 - t5*a/M*a/M/5040 + t5*a/M*a/M/5040*a/M*a/M/72);
+    }
+    res = res*ck;
+}
+
+int cosine(long long a){
+    int M = 1000000, ck = 1, res;
+    long long t4;
+    if(a < 0)a = -a;
+
+    if(a > 90*M){
+        ck = -1;
+        a = 180*M-a;
+    }
+
+    if(a > 45*M){
+        res = sine(90*M-a);
+    }
+    else{
+        a = a*3141593/(180*M);
+        t4 = a*a/M*a/M*a/M;
+        res = (int)(M - a*a/M/2 + t4/24 - t4*a/M*a/M/720 + t4*a/M*a/M/720*a/M*a/M/56);
+    }
+    return res * ck;
+}
+
 int geo_permission(struct gps_location loc){
     
     int x1_int = loc.lat_integer;
@@ -1617,23 +1681,25 @@ int geo_permission(struct gps_location loc){
     int y2_frac = current_location.lng_fractional;
 
     long long acc = loc.accuracy;
- 
-    int MM = 1000000;
 
-    long long dx = x1_int * MM + x1_frac - x2_int * MM - x2_frac;
-    long long dy = y1_int * MM + y1_frac - y2_int * MM - y2_frac;
+    int M = 1000000;
+    long long L = 20000;
 
+    int xx1 = x1_int * M + x1_frac;
+    int yy1 = y1_int * M + y1_frac;
+    int xx2 = x2_int * M + x2_frac;
+    int yy2 = y2_int * M + y2_frac;
+
+    int dx = xx2 - xx1;
+    int dy = yy2 - yy1;
+
+    long long t1 = dy * L * cosine((xx1 + xx2)/2) / M / 180 / M;
+    long long t2 = L * dx / 180 / M;
     acc += current_location.accuracy;
-    
-    if(dy > 180 * MM){
-        dy = 360*MM - dy;
-    }
-    if(dy < -180 * MM){
-        dy += 360*MM;
-    }
-    if(acc > 100000000)return 1;
-    if(dx*dx + dy*dy <= 81*acc * acc) return 1;
-    return 0;
+
+    if((t1*t1+t2*t2) > acc*acc)return 0;
+    return 1;
+
 }
 
 extern int generic_permission(struct inode *, int);
