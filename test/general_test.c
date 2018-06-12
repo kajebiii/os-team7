@@ -107,6 +107,7 @@ int main(int argc, char **args) {
 
     make_file("a");
     comp(g, "a");
+	for(int i = 0; i < 5; i++) write_write("a");
     make_file("b");
     comp(g, "b");
     
@@ -123,5 +124,7 @@ int main(int argc, char **args) {
     write_mmap("a");
     comp(g+1, "a");
 
+	// signal driven io
+	// aio_read, aio_write
     return 0;
 }
