@@ -175,23 +175,22 @@ You may need to open two or many terminal.
 ## How to calculate distance between two points
 * Assumption
 	* Earth is a perfect sphere
-	* GPS accuracy will be very small than Earth's radius (?)
-	* TODO? TODO?
+	* Earth's perimeter is 40,000km = 4 * 10^7 m
 * long long Div(long long a, long long b)
 	* In the kernel, we can't use divide operation(/) between two long long values.
-	* Use opertiaon(<<, >>, +, -) only
+	* Use basic opertiaons(<<, >>, +, -) only
 	* When a < 0, return -Div(-a, b) / When b < 0, return -Div(a, -b)
 	* Find minimum integer c that satisfy b * 2^c >= a
 	* Use division algorithm in binary system (learned in elementary school)
 * int cosine(long long a)
 	* ![cos](https://wikimedia.org/api/rest_v1/media/math/render/svg/b76af64626b80d6f66bdb964e1794c373b611479)
 	* Get value using taylor expansion method
-	* Caculate to fifth terms
+	* Caculate first five terms
 	* return cos(a / 1000000) value
 * int sine(long long a)
 	* ![sine](https://wikimedia.org/api/rest_v1/media/math/render/svg/def345e147219a7892eb8140dfeb1c77b29dce38)
 	* Get value using taylor expansion method
-	* Caculate to fifth terms
+	* Caculate first five terms
 	* return sin(a / 1000000) value
 
 ## EXTRA: ext4
@@ -213,7 +212,8 @@ You may need to open two or many terminal.
 		* add set_gps_location(inode) after update_time function called
 
 ## Any lessons learned
-* TODO
-* TODO
-* TODO
+* We learned about ext2 file system and structure of inode. We had to add new attributes to inode, and implement necessary functions, structs and global variables to implement it.
+* We learned about checking file permission. User with no permission should not access to file, and we can check it using kernel functions.
+* We learned how to calculate distance on sphere without using floating point operations and long long division. We had to implement distance calculation on sphere to check file permission, 
+* ext4 TODO
 
