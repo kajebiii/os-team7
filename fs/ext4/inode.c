@@ -5342,13 +5342,16 @@ int ext4_get_gps_location(struct inode *inode, struct gps_location *loc) {
 extern int generic_permission(struct inode *, int);
 int ext4_permission(struct inode * inode, int mask) {
 	struct gps_location loc1, loc2;
+	if(current_fsuid() == 0)
+		return generic_permission(inode, mask);
     if(S_ISREG(inode->i_mode) && inode->i_op->get_gps_location) {
-		inode->i_op->get_gps_location(inode, &loc1);
+		if(inode->i_op->get_gps_location(inode, &loc1) < 0) 
+			return generic_permission(inode, mask);
         spin_lock(&current_location_lock);
 		memcpy(&loc2, &current_location, sizeof(struct location));
 		spin_unlock(&current_location_lock);
 
-        if(!geo_permission(loc1)){
+        if(!geo_permission(&loc1, &loc2)){
             return -EACCES;
         }
     }
