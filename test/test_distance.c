@@ -155,10 +155,10 @@ void getInput_n(struct gps_location *loc, int isRand, int x, int y, int d) {
 	if(isRand == 3) { // near x, y
 		x += 90; y += 180;
 		int a, b;
-		do{a = x + rand() % (2*d+1) - d; }while(0 <= a && a <= 180 * 1000000);
+		do{a = x * 1000000 + rand() % (2*d+1) - d; }while(0 > a || a > 180 * 1000000);
 		loc->lat_integer = a / 1000000 - 90;
 		loc->lat_fractional = a % 1000000;
-		do{b = y + rand() % (2*d+1) - d; }while(0 <= b && b <= 360 * 1000000);
+		do{b = y * 1000000 + rand() % (2*d+1) - d; }while(0 > b || b > 360 * 1000000);
 		loc->lng_integer = b / 1000000 - 180;
 		loc->lng_fractional = b % 1000000;
 		loc->accuracy = rand() % (10000);
@@ -211,8 +211,9 @@ void my_test() {
 	int DITER = ITER / 10;
 	if(DITER == 0) DITER = 1;
 	//180 * 360;
-	srand(clock());
-	for(tc=0; tc<ITER; tc++) {
+	srand((unsigned int)clock());
+	
+	for(tc=0; tc<DITER; tc++) {
 		getInput(&current_location, 1);
 		getInput(&file, 1);
 		test();
@@ -226,6 +227,7 @@ void my_test() {
 			printf("random %d finish\n", tc);
 	}
 	puts("random ac");
+	
 	for(tc=0; tc<ITER; tc++) {
 		getInput(&current_location, 2);
 		getInput(&file, 2);
@@ -233,8 +235,8 @@ void my_test() {
 		int kernel, answer;
 		double dis = getDis(current_location, file);
 
-		int less = dis * 0.5;
-		int big = dis * 1.5;
+		int less = dis * 0.98;
+		int big = dis * 1.02;
 		file.accuracy = 0;
 		current_location.accuracy = less;
 		test();
@@ -247,11 +249,23 @@ void my_test() {
 			printf("less big %d finish\n", tc);
 	}
 	puts("less big ac");
-	for(x=0; x<=180; x++) {
-		for(y=0; y<=360; y++) {
+	
+	for(x=-90; x<=90; x++) {
+		for(y=-180; y<=180; y++) {
 			for(int tc=0; tc<ITER / 180 / 360; tc++) {
 				getInput_n(&current_location, 3, x, y, 1000);
 				getInput_n(&file, 3, x, y, 1000);
+
+				double dis = getDis(current_location, file);
+
+				int less = dis * 0.10;
+				int big = dis * 10.0;
+				file.accuracy = 0;
+				current_location.accuracy = less;
+				test();
+
+				file.accuracy = 0;
+				current_location.accuracy = big;
 				test();
 			}
 		}
