@@ -79,31 +79,8 @@ long long cosine(long long a) {
 	return res * ck;
 }
 
-
-long long arccos(long long a) {
-	int ck = 0;
-	int b = 0, e = 90000000, mid, r = 0, M = 1000000;
-	if (a < 0) {
-		a = -a;
-		ck = 1;
-	}
-	while (b <= e) {
-		mid = (b + e) >> 1;
-		if (cosine(mid) >= a) {
-			r = mid;
-			b = mid + 1;
-		}
-		else {
-			e = mid - 1;
-		}
-	}
-	if (ck)r = 180 * M - r;
-	return r;
-}
-
 long long Mul(long long a, long long b) {
-	int ck = 1;
-    int M;
+	int ck = 1, M;
     long long da, db;
 	if (a < 0)ck = -ck, a = -a;
 	if (b < 0)ck = -ck, b = -b;
@@ -113,28 +90,29 @@ long long Mul(long long a, long long b) {
 }
 
 
-int geo_permission(struct gps_location *loc1, struct gps_location *loc2){
-    
-    int x1_int = loc1->lat_integer;
-    int x1_frac = loc1->lat_fractional;
-    int y1_int = loc1->lng_integer;
-    int y1_frac = loc1->lng_fractional;
+int geo_permission2(struct gps_location *loc1, struct gps_location *loc2) {
 
-    int x2_int = loc2->lat_integer;
-    int x2_frac = loc2->lat_fractional;
-    int y2_int = loc2->lng_integer;
-    int y2_frac = loc2->lng_fractional;
+	int x1_int = loc1->lat_integer;
+	int x1_frac = loc1->lat_fractional;
+	int y1_int = loc1->lng_integer;
+	int y1_frac = loc1->lng_fractional;
 
-    long long acc = loc1->accuracy;
+	int x2_int = loc2->lat_integer;
+	int x2_frac = loc2->lat_fractional;
+	int y2_int = loc2->lng_integer;
+	int y2_frac = loc2->lng_fractional;
 
-    int M = 1000000;
-    long long R = 6400000;
-    long long L = 20000000;
+	long long acc = loc1->accuracy;
 
-    int xx1 = x1_int * M + x1_frac;
-    int yy1 = y1_int * M + y1_frac;
-    int xx2 = x2_int * M + x2_frac;
-    int yy2 = y2_int * M + y2_frac;
+	int M = 1000000;
+	long long R = 6400000;
+	long long L = 20000000;
+
+	int xx1 = x1_int * M + x1_frac;
+	int yy1 = y1_int * M + y1_frac;
+	int xx2 = x2_int * M + x2_frac;
+	int yy2 = y2_int * M + y2_frac;
+
 
 	long long dx = xx2 - xx1;
 	long long dy = yy2 - yy1;
@@ -150,9 +128,15 @@ int geo_permission(struct gps_location *loc1, struct gps_location *loc2){
 		dd1 = t1*t1 + t2*t2;
 	}
 	else {
-		long long uu = arccos(ttt);
-		dd1 = Div(Div(Mul(uu*R, 3141593),180), M);
-		dd1 = dd1*dd1;
+		long long ang = acc * 180 * M / 3141593 * M / R;
+		long long ttt2;
+
+		if (ang > 180000000)return 1;
+
+		ttt2 = cosine(ang);
+
+		if (ttt2 < ttt)return 1;
+		return 0;
 	}
 	if (dd1 > acc*acc)return 0;
 	return 1;
