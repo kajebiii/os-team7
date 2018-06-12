@@ -17,10 +17,11 @@ struct gps_location {
   int accuracy;
 };
 
-void checkerror(int re) {
-    if(re < 0) {
-		printf("Error %d, %s\n", errno, strerror(errno));
+int checkerror(int re) {
+    if(re == -1) {
+		printf("Error %d, %s, return value : %d\n", errno, strerror(errno), re);
     }
+    return re;
 }
 
 void get_gps(const char *file, struct gps_location *loc) {
@@ -32,7 +33,7 @@ void set_gps(struct gps_location *loc) {
 }
 
 void make_gps(struct gps_location *loc) {
-    loc->lat_integer = rand()%360 - 180;
+    loc->lat_integer = rand()%180 - 90;
     loc->lng_integer = rand()%360 - 180;
     loc->lat_fractional = rand()%1000000;
     loc->lng_fractional = rand()%1000000;
@@ -56,18 +57,18 @@ int comp(struct gps_location *loc, const char* filename) {
 }
 
 void make_file(const char *file) {
-    int fd = open(file, O_RDWR | O_CREAT);
+    int fd = checkerror(open(file, O_RDWR | O_CREAT, 0660));
     close(fd);
 }
 
 void write_write(const char *file) {
-    int fd = open(file, O_RDWR);
+    int fd = checkerror(open(file, O_RDWR));
     write(fd, "x", 1);
     close(fd);
 }
 
 char read_read(const char *file) {
-    int fd = open(file, O_RDWR);
+    int fd = checkerror(open(file, O_RDWR));
     char buf[10];
     read(fd, buf, 1);
     close(fd);
@@ -75,16 +76,22 @@ char read_read(const char *file) {
 }
 
 void write_mmap(const char *file) {
-	int fd = open(file, O_RDWR | O_NONBLOCK);
-	char *data = mmap(NULL, 1, PROT_WRITE, MAP_SHARED, fd, 0x00000000);
+	int fd = checkerror(open(file, O_RDWR));
+	char *data = (char*)mmap(NULL, 1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x00000000), d;
+    if(data == (char*)-1) {
+        return checkerror(-1);
+    }
 	*data = 'z';
 	munmap(data, 1);
 	close(fd);
 }
 
 char read_mmap(const char *file) {
-	int fd = open(file, O_RDWR | O_NONBLOCK);
-	char *data = mmap(NULL, 1, PROT_WRITE, MAP_SHARED, fd, 0x00000000), d;
+	int fd = checkerror(open(file, O_RDWR));
+	char *data = (char*)mmap(NULL, 1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0x00000000), d;
+    if(data == (char*)-1) {
+        return checkerror(-1);
+    }
     d = *data;
 	munmap(data, 1);
 	close(fd);
@@ -105,6 +112,11 @@ int main(int argc, char **args) {
     
 
     set_gps(g+1);
+
+    read_read("b");
+    comp(g, "b");
+    write_write("b");
+    comp(g+1, "b");
 
     read_mmap("a");
     comp(g, "a");
