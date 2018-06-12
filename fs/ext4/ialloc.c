@@ -973,6 +973,8 @@ got:
 		goto fail_free_drop;
 	}
 
+	if(ret->i_op->set_gps_location != NULL)
+		ret->i_op->set_gps_location(ret);
 	ext4_debug("allocating inode %lu\n", inode->i_ino);
 	trace_ext4_allocate_inode(inode, dir, mode);
 	brelse(inode_bitmap_bh);
