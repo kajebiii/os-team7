@@ -138,7 +138,7 @@ int geo_permission(struct gps_location *loc1, struct gps_location *loc2){
 
 	long long dx = xx2 - xx1;
 	long long dy = yy2 - yy1;
-	double dd1;
+	long long dd1;
 
 	long long tx1, tx2, ttt, ty1, tz1, ty2, tz2;
 	tx1 = Div(Mul(cosine(xx1), cosine(yy1)), M), ty1 = Div(Mul(cosine(xx1), sine(yy1)), M), tz1 = sine(xx1);
