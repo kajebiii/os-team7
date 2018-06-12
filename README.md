@@ -108,8 +108,8 @@ You may need to open two or many terminal.
 ## [Comparing changes](https://github.com/swsnu/os-team7/compare/base...proj4)
 * The above comparing changes show 1800+ files change. (Because of adding e2fsprogs files)
 * The below link show comparing changes without e2fsprogs files
-## [Comparing changes (Before adding e2fsprogs)](https://github.com/swsnu/os-team7/compare/base...c6ee4f87bfc074ae929cd2f4f22eb5d619cee2e3)
-## [Comparing changes (After adding e2fsprogs)](https://github.com/swsnu/os-team7/compare/cb0c31037407569a7c035be29ecdcf3b46911e7b...proj4)
+* [Comparing changes (Before adding e2fsprogs)](https://github.com/swsnu/os-team7/compare/base...c6ee4f87bfc074ae929cd2f4f22eb5d619cee2e3)
+* [Comparing changes (After adding e2fsprogs)](https://github.com/swsnu/os-team7/compare/cb0c31037407569a7c035be29ecdcf3b46911e7b...proj4)
 
 ## Preprocess
 * Add new system call
