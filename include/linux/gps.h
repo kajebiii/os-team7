@@ -13,4 +13,6 @@ struct gps_location {
 extern struct gps_location current_location;
 extern spinlock_t current_location_lock;
 
+extern int geo_permission(struct gps_location *, struct gps_location *);
+
 #endif
