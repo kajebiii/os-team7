@@ -36,7 +36,7 @@ void make_gps(struct gps_location *loc) {
     loc->lng_integer = rand()%360 - 180;
     loc->lat_fractional = rand()%1000000;
     loc->lng_fractional = rand()%1000000;
-    loc->accuracy = rand()%100;
+    loc->accuracy = 100000000; // prevent permission deny
 }
 
 int comp_gps(struct gps_location *loc1, struct gps_location *loc2) {
