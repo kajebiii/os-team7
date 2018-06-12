@@ -1689,7 +1689,7 @@ int geo_permission(struct gps_location loc){
 
     int M = 1000000;
     long long R = 6400;
-    long long L = 20000;
+    long long L = 20000000;
 
     int xx1 = x1_int * M + x1_frac;
     int yy1 = y1_int * M + y1_frac;
