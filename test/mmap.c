@@ -26,6 +26,7 @@ int main(int argc, char **args) {
     
 
 	fd = open(args[1], O_RDWR | O_NONBLOCK);
+	printf("fd : %d\n", fd);
 	data = mmap(NULL, 1, PROT_WRITE, MAP_SHARED, fd, 0x00000000);
 	*data = 'z';
 	munmap(data, 1);
