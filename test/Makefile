@@ -43,4 +43,4 @@ run:
 	sdb push $(TARGET_1) /root/$(TARGET_1) && sdb push $(TARGET_2) /root/$(TARGET_2) && sdb push $(TARGET_3) /root/$(TARGET_3) 
 	sdb push $(TARGET_4) /root/$(TARGET_4) 
 	sdb push $(TARGET_5) /root/$(TARGET_5) 
-	sdb push ../proj4.fs /root/proj4.fs
+	#sdb push ../proj4.fs /root/proj4.fs
