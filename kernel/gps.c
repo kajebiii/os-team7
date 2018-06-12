@@ -90,7 +90,7 @@ long long Mul(long long a, long long b) {
 }
 
 
-int geo_permission2(struct gps_location *loc1, struct gps_location *loc2) {
+int geo_permission(struct gps_location *loc1, struct gps_location *loc2) {
 
 	int x1_int = loc1->lat_integer;
 	int x1_frac = loc1->lat_fractional;
