@@ -30,8 +30,8 @@ long long Div(long long a, long long b) {
 }
 
 long long sine(long long a) {
-	int M = 1000000, ck = 1, res, i;
-	long long u[7];
+	int M = 1000000, ck = 1, i;
+	long long u[7], res;
 	if (a < 0) {
 		a = -a;
 		ck = -1;
@@ -44,18 +44,20 @@ long long sine(long long a) {
 	}
 	else {
 		a = Div(a * 3141593, (180 * M));
-		u[0] = a;
+		u[0] = a*M;
 		for (i = 1; i < 6; i++) {
 			u[i] = Div(Div(u[i - 1] * a, M)*a, M);
 		}
-		res = (int)(u[0] - Div(u[1], 6) + Div(u[2], 120) - Div(u[3], 5040) + Div(u[4], 362880));
+		res = (u[0] - Div(u[1], 6) + Div(u[2], 120) - Div(u[3], 5040) + Div(u[4], 362880));
 	}
 	return res*ck;
 }
 
+
+
 long long cosine(long long a) {
-	int M = 1000000, ck = 1, res, i;
-	long long u[7];
+	int M = 1000000, ck = 1, i;
+	long long u[7], res;
 	if (a < 0)a = -a;
 
 	if (a > 90 * M) {
@@ -68,52 +70,48 @@ long long cosine(long long a) {
 	}
 	else {
 		a = Div(a * 3141593, (180 * M));
-		u[0] = M;
+		u[0] = 1ll * M*M;
 		for (i = 1; i <= 6; i++) {
 			u[i] = Div(Div(u[i - 1] * a, M)*a, M);
 		}
-		res = (int)(u[0] - Div(u[1], 2) + Div(u[2], 24) - Div(u[3], 720) + Div(u[4], 40320) + Div(u[5], 3628800));
+		res = (u[0] - Div(u[1], 2) + Div(u[2], 24) - Div(u[3], 720) + Div(u[4], 40320) + Div(u[5], 3628800));
 	}
 	return res * ck;
 }
 
 
 long long arccos(long long a) {
-	int M = 1000000, i;
-	long long u[10];
-	if (a > 950000) {
-		long long b = 1, e = 1000000, mid, r = 0;
-		while (b <= e) {
-			mid = (b + e) >> 1;
-			if (mid*mid + a*a >= 1ll * M*M) {
-				r = mid;
-				e = mid - 1;
-			}
-			else b = mid + 1;
+	int ck = 0;
+	int b = 0, e = 90000000, mid, r = 0, M = 1000000;
+	if (a < 0) {
+		a = -a;
+		ck = 1;
+	}
+	while (b <= e) {
+		mid = (b + e) >> 1;
+		if (cosine(mid) >= a) {
+			r = mid;
+			b = mid + 1;
 		}
-		return r;
+		else {
+			e = mid - 1;
+		}
 	}
-	u[0] = a*M;
-	for (i = 1; i <= 7; i++) {
-		u[i] = Div(Div(u[i - 1] * a, M)*a, M);
-	}
-	return (int)(3141593 / 2 - Div(u[0] + Div(u[1], 6) + Div(u[2] * 3, 40) + Div(u[3] * 5, 112) + Div(u[4] * 35, 1152) + Div(u[5] * 63, 2816) + Div(u[6] * 63 * 11, 39936), M));
+	if (ck)r = 180 * M - r;
+	return r;
 }
 
 long long Mul(long long a, long long b) {
-
 	int ck = 1;
-    int M = 100000;
+    int M;
     long long da, db;
-	if (a < 0)ck = -ck,a=-a;
-
-	if (b < 0)ck = -ck,b=-b;
-
+	if (a < 0)ck = -ck, a = -a;
+	if (b < 0)ck = -ck, b = -b;
+	M = 1000000;
 	da = Div(a, M), db = Div(b, M);
-
 	return (da * db * M + (a - da*M) * db + da * (b - db*M))*ck;
-
 }
+
 
 int geo_permission(struct gps_location *loc1, struct gps_location *loc2){
     
@@ -130,7 +128,7 @@ int geo_permission(struct gps_location *loc1, struct gps_location *loc2){
     long long acc = loc1->accuracy;
 
     int M = 1000000;
-    long long R = 6400;
+    long long R = 6400000;
     long long L = 20000000;
 
     int xx1 = x1_int * M + x1_frac;
@@ -143,22 +141,21 @@ int geo_permission(struct gps_location *loc1, struct gps_location *loc2){
 	double dd1;
 
 	long long tx1, tx2, ttt, ty1, tz1, ty2, tz2;
-	tx1 = cosine(xx1)*cosine(yy1), ty1 = cosine(xx1)*sine(yy1), tz1 = sine(xx1);
-	tx2 = cosine(xx2)*cosine(yy2), ty2 = cosine(xx2)*sine(yy2), tz2 = sine(xx2);
-	ttt = Div(Div((Mul(tx1, tx2) + Mul(ty1, ty2) + tz1*tz2*M), M), M);
-	if (ttt < 999900) {
-		dd1 = Div(arccos(ttt)*R, M);
-		dd1 = dd1*dd1;
-	}
-	else {
-		long long t1 = Div(Div(dy * Div(L, M) * cosine((xx1 + xx2) / 2), 180), M);
+	tx1 = Div(Mul(cosine(xx1), cosine(yy1)), M), ty1 = Div(Mul(cosine(xx1), sine(yy1)), M), tz1 = sine(xx1);
+	tx2 = Div(Mul(cosine(xx2), cosine(yy2)), M), ty2 = Div(Mul(cosine(xx2), sine(yy2)), M), tz2 = sine(xx2);
+	ttt = Div((Mul(tx1, tx2) + Mul(ty1, ty2) + Mul(tz1, tz2)), M);
+	if (ttt > 999999000000ll) {
+		long long t1 = Div(Div(dy * Div(L, M) * Div(cosine((xx1 + xx2) / 2), M), 180), M);
 		long long t2 = Div(Div(L * dx, 180), M);
-
 		dd1 = t1*t1 + t2*t2;
 	}
-
-    if(dd1 > acc*acc)return 0;
-    return 1;
+	else {
+		long long uu = arccos(ttt);
+		dd1 = Div(Div(Mul(uu*R, 3141593),180), M);
+		dd1 = dd1*dd1;
+	}
+	if (dd1 > acc*acc)return 0;
+	return 1;
 
 }
 
