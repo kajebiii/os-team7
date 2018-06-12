@@ -74,7 +74,7 @@ long long cosine(long long a) {
 		for (i = 1; i <= 6; i++) {
 			u[i] = Div(Div(u[i - 1] * a, M)*a, M);
 		}
-		res = (u[0] - Div(u[1], 2) + Div(u[2], 24) - Div(u[3], 720) + Div(u[4], 40320) + Div(u[5], 3628800));
+		res = (u[0] - Div(u[1], 2) + Div(u[2], 24) - Div(u[3], 720) + Div(u[4], 40320) - Div(u[5], 3628800));
 	}
 	return res * ck;
 }
@@ -86,7 +86,7 @@ long long Mul(long long a, long long b) {
 	if (b < 0)ck = -ck, b = -b;
 	M = 1000000;
 	da = Div(a, M), db = Div(b, M);
-	return (da * db * M + (a - da*M) * db + da * (b - db*M))*ck;
+	return (da * db * M + (a - da*M) * db + da * (b - db*M) + Div((a - da*M) * (b-db*M), M))*ck;
 }
 
 
