@@ -31,13 +31,7 @@ int file_loc() {
 		printf("Error %d, %s\n", errno, strerror(errno));
 		return 0;
 	}else{
-		printf("latitude:\t%d.%06d\n", result.lat_integer, result.lat_fractional);
-		printf("longitude:\t%d.%06d\n", result.lng_integer, result.lng_fractional);
-		printf("accuracy:\t%d(m)\n\n", result.accuracy);
 		file_result = result;
-
-		printf("Google Map Link\n");
-		printf("https://www.google.com/maps/@%d.%06d,%d.%06d,15z\n", result.lat_integer, result.lat_fractional, result.lng_integer, result.lng_fractional);
     	return 1;
 	}
 
@@ -52,7 +46,7 @@ int gps_update_with_loc(struct gps_location data) {
 		return 0;
     }
     else {
-        printf("Update success!\n");
+        //printf("Update success!\n");
 		return 1;
     }
 
@@ -186,13 +180,11 @@ void setting() {
 	temp.accuracy = 200000000;
 	gps_update_with_loc(temp);
 	fd = open(filename, O_CREAT|O_WRONLY|O_TRUNC);
-	printf("first %d\n", fd);
 	if(fd == -1) exit(-1);
 	close(fd);
 	temp = file;
 	gps_update_with_loc(temp);
 	fd = open(filename, O_CREAT|O_WRONLY|O_TRUNC);
-	printf("second %d\n", fd);
 	if(fd == -1) exit(-1);
 	close(fd);
 	gps_update_with_loc(current_location);
@@ -215,24 +207,28 @@ void test() {
 	}
 }
 void my_test() {
-	int tc, i, j, x, y;
+	int tc, x, y;
 	int DITER = ITER / 10;
 	if(DITER == 0) DITER = 1;
 	//180 * 360;
 	srand(clock());
 	for(tc=0; tc<ITER; tc++) {
+		getInput(&current_location, 1);
+		getInput(&file, 1);
+		test();
+		getInput(&current_location, 2);
+		getInput(&file, 2);
+		test();
 		getInput(&current_location, 3);
 		getInput(&file, 3);
-		printLoc(&current_location);
-		printLoc(&file);
 		test();
-		if(i % DITER == 0) 
+		if(tc % DITER == 0) 
 			printf("random %d finish\n", tc);
 	}
 	puts("random ac");
 	for(tc=0; tc<ITER; tc++) {
-		getInput(&current_location, 3);
-		getInput(&file, 3);
+		getInput(&current_location, 2);
+		getInput(&file, 2);
 		long long acc;
 		int kernel, answer;
 		double dis = getDis(current_location, file);
@@ -247,7 +243,7 @@ void my_test() {
 		current_location.accuracy = big;
 		test();
 
-		if(i % DITER == 0) 
+		if(tc % DITER == 0) 
 			printf("less big %d finish\n", tc);
 	}
 	puts("less big ac");
