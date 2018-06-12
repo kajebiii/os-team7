@@ -195,8 +195,13 @@ You may need to open two or many terminal.
 
 ## EXTRA: ext4
 * [Our submission branch (ext4)](https://github.com/swsnu/os-team7/tree/proj4-ext4)
-* ext4 is quite similar to ext2, but following are different from ext2
-### Main implementation 
+* ext4 is quite similar to ext2, but following are different from ext2:
+	* Location information is not stored as variable in struct inode, but it's stored using xattr.
+	* Because ext4 file system is used mainly in booting kernel/etc, these programs should be executed without location check procedure.
+		* When there is no location information set, skip location check procedure and continues general permission check.
+	* Test could be done without loopback device on ext4 file system, so we did not use it here.
+
+### Main implementation (ext4)
 * [kernel/gps.c](https://github.com/swsnu/os-team7/blob/proj4-ext4/fs/ext4/inode.c)
 	* ext4_set_gps_location
 		* set gps_location value using ext4_xattr_set function
@@ -204,8 +209,11 @@ You may need to open two or many terminal.
 		* get gps_location value using ext4_xattr_get function
 		* when there is no gps_location in file ... TODO TODO TODO
 	* ext4_permission
-		* TODO
-### Other modified files to set gps location
+		* check inode's access permission
+		* if user is root, just returns generic_permission result.
+		* else if file's position is never set, location informations are not checked and generic_permission result is returned.
+		* else checks location information (calls geo_permission), and returns error or calls generic_permission.
+### Other modified files to set gps location (ext4)
 * [kernel/gps.c](https://github.com/swsnu/os-team7/blob/proj4-ext4/fs/ext4/inode.c)
 	* ext4_page_mkwrite
 		* kernel funciton
@@ -215,5 +223,5 @@ You may need to open two or many terminal.
 * We learned about ext2 file system and structure of inode. We had to add new attributes to inode, and implement necessary functions, structs and global variables to implement it.
 * We learned about checking file permission. User with no permission should not access to file, and we can check it using kernel functions.
 * We learned how to calculate distance on sphere without using floating point operations and long long division. We had to implement distance calculation on sphere to check file permission, 
-* ext4 TODO
+* We learned how to use xattr in ext4 to handle extra attributes. We used these features to implement geographical location in ext4 file system.
 
