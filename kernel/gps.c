@@ -200,7 +200,7 @@ SYSCALL_DEFINE2(get_gps_location, const char __user *, pathname_user, struct gps
 		goto error;
 	}
 	if(inode->i_op->get_gps_location) {
-		if((err = inode->i_op->get_gps_location(inode, &loc)) < 0) goto err;
+		if((err = inode->i_op->get_gps_location(inode, &loc)) < 0) goto error;
     	if((err = copy_to_user(loc_user, &loc, sizeof(struct gps_location))) < 0) goto error;
 	}else{
 		err = -ENODEV;
