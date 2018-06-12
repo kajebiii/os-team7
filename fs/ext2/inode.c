@@ -1616,15 +1616,7 @@ int ext2_permission(struct inode *inode, int mask) {
 		memcpy(&l2, &current_location, sizeof(struct gps_location));
 		spin_unlock(&current_location_lock);
 
-<<<<<<< HEAD
-    if(S_ISREG(inode->i_mode)){
-	// TODO: check geo_permission here
-
-        spin_lock(&current_location_lock);
-        if(!geo_permission(ei->i_loc)){
-=======
         if(!geo_permission(&l1, &l2)){
->>>>>>> move geo_permission to gps.c
             return -EACCES;
         }
     }
