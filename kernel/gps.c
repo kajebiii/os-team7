@@ -119,6 +119,10 @@ int geo_permission(struct gps_location *loc1, struct gps_location *loc2) {
 	long long dd1;
 
 	long long tx1, tx2, ttt, ty1, tz1, ty2, tz2;
+    acc += loc2->accuracy;
+
+    if(acc > L)return 1;
+
 	tx1 = Div(Mul(cosine(xx1), cosine(yy1)), M), ty1 = Div(Mul(cosine(xx1), sine(yy1)), M), tz1 = sine(xx1);
 	tx2 = Div(Mul(cosine(xx2), cosine(yy2)), M), ty2 = Div(Mul(cosine(xx2), sine(yy2)), M), tz2 = sine(xx2);
 	ttt = Div((Mul(tx1, tx2) + Mul(ty1, ty2) + Mul(tz1, tz2)), M);
