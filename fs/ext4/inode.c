@@ -5334,10 +5334,23 @@ int ext4_set_gps_location(struct inode *inode) {
 }
 
 int ext4_get_gps_location(struct inode *inode, struct gps_location *loc) {
+	loc->lat_integer = loc->lat_fractional = loc->lng_integer = loc->lng_fractional = 0;
+	loc->accuracy = -1;
 	return ext4_xattr_get(inode, EXT4_XATTR_INDEX_SYSTEM, "gps_location", loc, sizeof(struct gps_location));
 }
 
 extern int generic_permission(struct inode *, int);
 int ext4_permission(struct inode * inode, int mask) {
+	struct gps_location loc1, loc2;
+    if(S_ISREG(inode->i_mode) && inode->i_op->get_gps_location) {
+		inode->i_op->get_gps_location(inode, &loc1);
+        spin_lock(&current_location_lock);
+		memcpy(&loc2, &current_location, sizeof(struct location));
+		spin_unlock(&current_location_lock);
+
+        if(!geo_permission(loc1)){
+            return -EACCES;
+        }
+    }
 	return generic_permission(inode, mask);
 }
