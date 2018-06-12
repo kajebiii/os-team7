@@ -100,7 +100,16 @@ int main(int argc, char **args) {
 
     make_file("a");
     comp(g, "a");
-    //
+    make_file("b");
+    comp(g, "b");
+    
+
+    set_gps(g+1);
+
+    read_mmap("a");
+    comp(g, "a");
+    write_mmap("a");
+    comp(g+1, "a");
 
     return 0;
 }
