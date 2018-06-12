@@ -108,8 +108,8 @@ You may need to open two or many terminal.
 ## [Comparing changes](https://github.com/swsnu/os-team7/compare/base...proj4)
 * The above comparing changes show 1800+ files change. (Because of adding e2fsprogs files)
 * The below link show comparing changes without e2fsprogs files
-## [Comparing changes (Before adding e2fsprogs)](https://github.com/swsnu/os-team7/compare/base...c6ee4f87bfc074ae929cd2f4f22eb5d619cee2e3)
-## [Comparing changes (After adding e2fsprogs)](https://github.com/swsnu/os-team7/compare/cb0c31037407569a7c035be29ecdcf3b46911e7b...proj4)
+* [Comparing changes (Before adding e2fsprogs)](https://github.com/swsnu/os-team7/compare/base...c6ee4f87bfc074ae929cd2f4f22eb5d619cee2e3)
+* [Comparing changes (After adding e2fsprogs)](https://github.com/swsnu/os-team7/compare/cb0c31037407569a7c035be29ecdcf3b46911e7b...proj4)
 
 ## Preprocess
 * Add new system call
@@ -142,6 +142,10 @@ You may need to open two or many terminal.
 		* Get file's current location
 		* Write file's current location to user pointer, and returns.
 		* return 0 on success, -ENOENT on invalid filepath, -EFAULT on invalid user pointer, -EINVAL on invalid path name, -EACCES on no permission, -ENODEV on invalid gps position.
+	* geo_permission
+		* Calculates distance between file's current location and device's current location, and check whether it's valid.
+		* If two location can be same, returns 1. else returns 0.
+		* Methods used to calculate distance are described below section.
 
 * [fs/ext2/inode.c](https://github.com/swsnu/os-team7/blob/proj4/fs/ext2/inode.c)
 	* ext2_set_gps_location
@@ -151,10 +155,6 @@ You may need to open two or many terminal.
 	* ext2_permission
 		* Calls geo_permission function to check whether location is valid or not.
 		* If geo_permission fails, returns -EACCES. Else, calls generic_permission and returns.
-	* geo_permission
-		* Calculates distance between file's current location and device's current location, and check whether it's valid.
-		* If two location can be same, returns 1. else returns 0.
-		* Methods used to calculate distance are described below section.
 
 ## Other modified files to set gps location
 * [fs/attr.c](https://github.com/swsnu/os-team7/blob/proj4/fs/attr.c)
@@ -175,45 +175,54 @@ You may need to open two or many terminal.
 ## How to calculate distance between two points
 * Assumption
 	* Earth is a perfect sphere
-	* GPS accuracy will be very small than Earth's radius (?)
-	* TODO? TODO?
+	* Earth's perimeter is 40,000km = 4 * 10^7 m
 * long long Div(long long a, long long b)
 	* In the kernel, we can't use divide operation(/) between two long long values.
-	* Use opertiaon(<<, >>, +, -) only
+	* Use basic opertiaons(<<, >>, +, -) only
 	* When a < 0, return -Div(-a, b) / When b < 0, return -Div(a, -b)
 	* Find minimum integer c that satisfy b * 2^c >= a
 	* Use division algorithm in binary system (learned in elementary school)
 * int cosine(long long a)
 	* ![cos](https://wikimedia.org/api/rest_v1/media/math/render/svg/b76af64626b80d6f66bdb964e1794c373b611479)
 	* Get value using taylor expansion method
-	* Caculate to fifth terms
+	* Caculate first five terms
 	* return cos(a / 1000000) value
 * int sine(long long a)
 	* ![sine](https://wikimedia.org/api/rest_v1/media/math/render/svg/def345e147219a7892eb8140dfeb1c77b29dce38)
 	* Get value using taylor expansion method
-	* Caculate to fifth terms
+	* Caculate first five terms
 	* return sin(a / 1000000) value
 
 ## EXTRA: ext4
 * [Our submission branch (ext4)](https://github.com/swsnu/os-team7/tree/proj4-ext4)
-* ext4 is quite similar to ext2, but following are different from ext2
-### Main implementation 
-* [kernel/gps.c](https://github.com/swsnu/os-team7/blob/proj4-ext4/fs/ext4/inode.c)
+* ext4 is quite similar to ext2, but following are different from ext2:
+	* Location information is not stored as variable in struct inode, but it's stored using xattr.
+	* Because ext4 file system is used mainly in booting kernel/etc, these programs should be executed without location check procedure.
+		* If user is root, skip location check procedure and continues general permission check.
+		* When there is no location information set, skip location check procedure and continues general permission check.
+	* Test could be done without loopback device on ext4 file system, so we did not use it here.
+
+### Main implementation (ext4)
+* [kernel/inode.c](https://github.com/swsnu/os-team7/blob/proj4-ext4/fs/ext4/inode.c)
 	* ext4_set_gps_location
 		* set gps_location value using ext4_xattr_set function
 	* ext4_get_gps_location
 		* get gps_location value using ext4_xattr_get function
-		* when there is no gps_location in file ... TODO TODO TODO
+		* when ext4_xattr_get returns -ENODATA (there is no location information set), returns -ENODATA. Else, write location information to pointer and returns 0.
 	* ext4_permission
-		* TODO
-### Other modified files to set gps location
+		* check inode's access permission
+		* if user is root, just returns generic_permission result.
+		* else if file's position is never set, location informations are not checked and generic_permission result is returned.
+		* else checks location information (calls geo_permission), and returns error or calls generic_permission.
+### Other modified files to set gps location (ext4)
 * [kernel/gps.c](https://github.com/swsnu/os-team7/blob/proj4-ext4/fs/ext4/inode.c)
 	* ext4_page_mkwrite
 		* kernel funciton
 		* add set_gps_location(inode) after update_time function called
 
 ## Any lessons learned
-* TODO
-* TODO
-* TODO
+* We learned about ext2 file system and structure of inode. We had to add new attributes to inode, and implement necessary functions, structs and global variables to implement it.
+* We learned about checking file permission. User with no permission should not access to file, and we can check it using kernel functions.
+* We learned how to calculate distance on sphere without using floating point operations and long long division. We had to implement distance calculation on sphere to check file permission, 
+* We learned how to use xattr in ext4 to handle extra attributes. We used these features to implement geographical location in ext4 file system.
 
