@@ -198,16 +198,17 @@ You may need to open two or many terminal.
 * ext4 is quite similar to ext2, but following are different from ext2:
 	* Location information is not stored as variable in struct inode, but it's stored using xattr.
 	* Because ext4 file system is used mainly in booting kernel/etc, these programs should be executed without location check procedure.
+		* If user is root, skip location check procedure and continues general permission check.
 		* When there is no location information set, skip location check procedure and continues general permission check.
 	* Test could be done without loopback device on ext4 file system, so we did not use it here.
 
 ### Main implementation (ext4)
-* [kernel/gps.c](https://github.com/swsnu/os-team7/blob/proj4-ext4/fs/ext4/inode.c)
+* [kernel/inode.c](https://github.com/swsnu/os-team7/blob/proj4-ext4/fs/ext4/inode.c)
 	* ext4_set_gps_location
 		* set gps_location value using ext4_xattr_set function
 	* ext4_get_gps_location
 		* get gps_location value using ext4_xattr_get function
-		* when there is no gps_location in file ... TODO TODO TODO
+		* when ext4_xattr_get returns -ENODATA (there is no location information set), returns -ENODATA. Else, write location information to pointer and returns 0.
 	* ext4_permission
 		* check inode's access permission
 		* if user is root, just returns generic_permission result.
