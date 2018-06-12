@@ -5348,7 +5348,7 @@ int ext4_permission(struct inode * inode, int mask) {
 		if(inode->i_op->get_gps_location(inode, &loc1) < 0) 
 			return generic_permission(inode, mask);
         spin_lock(&current_location_lock);
-		memcpy(&loc2, &current_location, sizeof(struct location));
+		memcpy(&loc2, &current_location, sizeof(struct gps_location));
 		spin_unlock(&current_location_lock);
 
         if(!geo_permission(&loc1, &loc2)){
