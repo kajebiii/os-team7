@@ -41,7 +41,11 @@ HOST$ make
 HOST$ make run
 ```
 Then, It will compile test codes (includes file_loc.c, gpsupdate.c) and transfer our test excutable files (includes file_loc, gpsupdate) between the device and your PC.
-Also, it will transfer proj4.fs. pro4.fs have one directory(named "directory") and two files(named "snu301" and "snu25").
+Also, type
+```bash
+HOST$ sdb push ../proj4.fs /root/proj4.fs
+```
+above command. It will transfer proj4.fs. pro4.fs have one directory(named "USA") and four files(named "snu301", "snu25", "Nakseongdae", "USA/whitehouse").
 
 The following is output of `file_loc` when called on our files and directory.
 ```
@@ -49,6 +53,8 @@ BOARD$ mkdir /root/proj4
 BOARD$ cd /root/
 BOARD$ mount -o loop -t ext2 /root/proj4.fs /root/proj4
 BOARD$ cd /root/proj4
+BOARD$ ls
+Nakseongdae  USA  lost+found  snu25  snu301
 BOARD$ ../file_loc snu301
 latitude:       37.450005
 longitude:      126.952366
@@ -66,6 +72,25 @@ https://www.google.com/maps/@37.458773,126.949533,15z
 BOARD$ ../file_loc directory
 File_Loc fail!
 Error 19, No such device
+
+BOARD$ ../file_loc Nakseongdae
+latitude:       37.477184
+longitude:      126.962739
+accuracy:       64(m)
+
+Google Map Link
+https://www.google.com/maps/@37.477184,126.962739,15z
+
+BOARD$ cd USA
+BOARD$ ls
+whitehouse
+BOARD$ ../../file_loc whitehouse
+latitude:       38.897680
+longitude:      -77.038718
+accuracy:       73(m)
+
+Google Map Link
+https://www.google.com/maps/@38.897680,-77.038718,15z
 ```
 
 And if you call `gpsupdate` you can change your location. The following is example.
