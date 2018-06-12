@@ -128,7 +128,7 @@ int geo_permission2(struct gps_location *loc1, struct gps_location *loc2) {
 		dd1 = t1*t1 + t2*t2;
 	}
 	else {
-		long long ang = acc * 180 * M / 3141593 * M / R;
+		long long ang = Div(Div(acc * 180 * M, 3141593) * M, R);
 		long long ttt2;
 
 		if (ang > 180000000)return 1;
