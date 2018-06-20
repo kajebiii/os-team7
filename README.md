@@ -1,7 +1,9 @@
 # OS Team 7
 
-## Project 4
+Jo Seunghyeon, Kim Jongbeom, Lee Jaebeom, Park Seonggwan
 
+## Project 4
+* [75/75](https://github.com/kajebiii/os-team7/issues/4)
 * [Project 4 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project4.md)  
 * Assigned: 2017-05-20 Sunday 21:00:00 KST
 * Design Review Due: 2017-06-04 Monday KST
@@ -14,7 +16,7 @@
   * [ftrace](https://linuxkernelmsg.wordpress.com/2017/01/11/%EB%B2%88%EC%97%AD-lwn-debugging-the-kernel-using-ftrace%E2%80%8A-%E2%80%8Apart-1/)
 
 ## Project 3
-
+* [65.625/70](https://github.com/kajebiii/os-team7/issues/3)
 * [Project 3 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project3.md)  
 * Assigned: 2018-04-25 Wednesday 14:00:00 KST
 * Design Review Due: 2018-05-08 Tuesday KST
@@ -30,7 +32,7 @@
 
 
 ## Project 2
-
+* [54/55](https://github.com/kajebiii/os-team7/issues/2)
 * [Project 2 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project2.md)  
 * Design Review Due: 2018-04-10 Tuesday KST
 * **Due: 2018-04-17 Tuesday 20:59:59 KST**
@@ -38,7 +40,7 @@
 * [Our submission branch](https://github.com/swsnu/os-team7/tree/proj2)
 
 ## Project 1
-
+* [55/55](https://github.com/kajebiii/os-team7/issues/1)
 * [Project 1 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project1.md)  
 * Design Review Due: 2018-03-18 Sunday
 * Due: 2018-03-25 Sunday 20:59:59 KST
