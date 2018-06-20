@@ -4,12 +4,12 @@ Jo Seunghyeon, Kim Jongbeom, Lee Jaebeom, Park Seonggwan
 
 ## Project 4
 * [75/75](https://github.com/kajebiii/os-team7/issues/4)
-* [Project 4 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project4.md)  
+* [Project 4 Spec](https://github.com/kajebiii/os-team7/blob/master/Project4.md)  
 * Assigned: 2017-05-20 Sunday 21:00:00 KST
 * Design Review Due: 2017-06-04 Monday KST
 * **Due: 2017-06-12 Tuesday 20:59:59 KST**
 * team project
-* [Our submission branch](https://github.com/swsnu/os-team7/tree/proj4)
+* [Our submission branch](https://github.com/kajebiii/os-team7/tree/proj4)
 
 * **Helpful Links**
   * [get inode form path](https://stackoverflow.com/questions/27869570/retrieving-inode-struct-given-the-path-to-a-file)
@@ -17,13 +17,13 @@ Jo Seunghyeon, Kim Jongbeom, Lee Jaebeom, Park Seonggwan
 
 ## Project 3
 * [65.625/70](https://github.com/kajebiii/os-team7/issues/3)
-* [Project 3 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project3.md)  
+* [Project 3 Spec](https://github.com/kajebiii/os-team7/blob/master/Project3.md)  
 * Assigned: 2018-04-25 Wednesday 14:00:00 KST
 * Design Review Due: 2018-05-08 Tuesday KST
 * **Due: 2018-05-20 Sunday 20:59:59 KST**
  * Presentation : 2018-05-21 Monday during class
 * team project
-* [Our submission branch](https://github.com/swsnu/os-team7/tree/proj3)
+* [Our submission branch](https://github.com/kajebiii/os-team7/tree/proj3)
 
 * **Helpful Links**
   * [link1](https://elixir.bootlin.com/linux/v3.10/source)
@@ -33,19 +33,19 @@ Jo Seunghyeon, Kim Jongbeom, Lee Jaebeom, Park Seonggwan
 
 ## Project 2
 * [54/55](https://github.com/kajebiii/os-team7/issues/2)
-* [Project 2 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project2.md)  
+* [Project 2 Spec](https://github.com/kajebiii/os-team7/blob/master/Project2.md)  
 * Design Review Due: 2018-04-10 Tuesday KST
 * **Due: 2018-04-17 Tuesday 20:59:59 KST**
 * team project
-* [Our submission branch](https://github.com/swsnu/os-team7/tree/proj2)
+* [Our submission branch](https://github.com/kajebiii/os-team7/tree/proj2)
 
 ## Project 1
 * [55/55](https://github.com/kajebiii/os-team7/issues/1)
-* [Project 1 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project1.md)  
+* [Project 1 Spec](https://github.com/kajebiii/os-team7/blob/master/Project1.md)  
 * Design Review Due: 2018-03-18 Sunday
 * Due: 2018-03-25 Sunday 20:59:59 KST
 * team project
-* [Our submission branch](https://github.com/swsnu/os-team7/tree/proj1)
+* [Our submission branch](https://github.com/kajebiii/os-team7/tree/proj1)
 
 * **Helpful Links**
   * [link1](https://m.blog.naver.com/PostView.nhn?blogId=lee_seha&logNo=220339665756&proxyReferer=https%3A%2F%2Fwww.google.co.kr%2F)
@@ -54,7 +54,6 @@ Jo Seunghyeon, Kim Jongbeom, Lee Jaebeom, Park Seonggwan
   * [link4](http://webnautes.tistory.com/554)
 
 ## Project 0
-* [Project 0 Spec](https://github.com/swsnu/osspr2018/blob/master/doc/Project0.md)
-* names of students who have submitted Project0 : [submission list](https://github.com/swsnu/osspr2018/blob/master/doc/Project0Submissions.md)
+* [Project 0 Spec](https://github.com/kajebiii/os-team7/blob/master/Project0.md)
 * Due: 2018-03-14 Wednesday 20:59:59 KST
 * individual project
